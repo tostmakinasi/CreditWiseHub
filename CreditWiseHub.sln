@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreditWiseHub.Core", "CreditWiseHub.Core\CreditWiseHub.Core.csproj", "{D1996D9C-B4DE-4BAC-9955-6CBA69925941}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreditWiseHub.Repository", "CreditWiseHub.Repository\CreditWiseHub.Repository.csproj", "{329D1301-6919-4596-B0A8-9D90A0830C13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreditWiseHub.Service", "CreditWiseHub.Service\CreditWiseHub.Service.csproj", "{9DDAD095-5032-4216-95BA-C6F47A17510B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreditWiseHub.API", "CreditWiseHub.API\CreditWiseHub.API.csproj", "{400A003B-4BA8-45A5-BAA3-1CFA409C61E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1996D9C-B4DE-4BAC-9955-6CBA69925941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1996D9C-B4DE-4BAC-9955-6CBA69925941}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1996D9C-B4DE-4BAC-9955-6CBA69925941}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1996D9C-B4DE-4BAC-9955-6CBA69925941}.Release|Any CPU.Build.0 = Release|Any CPU
+		{329D1301-6919-4596-B0A8-9D90A0830C13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{329D1301-6919-4596-B0A8-9D90A0830C13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{329D1301-6919-4596-B0A8-9D90A0830C13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{329D1301-6919-4596-B0A8-9D90A0830C13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DDAD095-5032-4216-95BA-C6F47A17510B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DDAD095-5032-4216-95BA-C6F47A17510B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DDAD095-5032-4216-95BA-C6F47A17510B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DDAD095-5032-4216-95BA-C6F47A17510B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{400A003B-4BA8-45A5-BAA3-1CFA409C61E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{400A003B-4BA8-45A5-BAA3-1CFA409C61E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{400A003B-4BA8-45A5-BAA3-1CFA409C61E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{400A003B-4BA8-45A5-BAA3-1CFA409C61E5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
