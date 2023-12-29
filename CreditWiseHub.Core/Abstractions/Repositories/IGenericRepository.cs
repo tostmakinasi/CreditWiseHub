@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 
 namespace CreditWiseHub.Core.Abstractions.Repositories
 {
@@ -23,7 +18,7 @@ namespace CreditWiseHub.Core.Abstractions.Repositories
         /// <summary>
         /// Retrieves all entities without any conditions.
         /// </summary>
-        /// <returns>Query for all entities.</returns>
+        /// <returns>List for all entities.</returns>
         IQueryable<T> GetAll();
 
         /// <summary>
