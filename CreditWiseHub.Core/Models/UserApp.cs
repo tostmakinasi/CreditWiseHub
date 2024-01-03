@@ -1,5 +1,6 @@
 ﻿using CreditWiseHub.Core.Commons;
 using Microsoft.AspNetCore.Identity;
+using System.Runtime.CompilerServices;
 
 namespace CreditWiseHub.Core.Models
 {

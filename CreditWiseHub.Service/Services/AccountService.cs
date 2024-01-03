@@ -126,7 +126,7 @@ namespace CreditWiseHub.Service.Services
                 return Response<AccountLastInfoDto>.Fail(checkLimits.error, HttpStatusCode.NotAcceptable, false);
 
             await _unitOfWork.BeginTransactionAsync();
-            await _transactionService.AddDepositWithdrawalProcess(account, amountDto.Amount, Core.Enums.TransactionType.Withdraw, true);
+            await _transactionService.AddDepositWithdrawalProcess(account, amountDto.Amount,false, Core.Enums.TransactionType.Withdraw, true);
 
             account.Balance -= amountDto.Amount;
             account.UpdatedDate = DateTime.UtcNow;
