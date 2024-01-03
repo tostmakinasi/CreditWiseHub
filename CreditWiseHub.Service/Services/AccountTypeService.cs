@@ -8,22 +8,17 @@ using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CreditWiseHub.Service.Services
 {
     public class AccountTypeService : IAccountTypeService
     {
-        private readonly IGenericRepository<AccountType> _repository;
+        private readonly IGenericRepository<AccountType, int> _repository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public AccountTypeService(IGenericRepository<AccountType> repository, IUnitOfWork unitOfWork, IMapper mapper)
+        public AccountTypeService(IGenericRepository<AccountType, int> repository, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
@@ -35,7 +30,7 @@ namespace CreditWiseHub.Service.Services
             var accountType = _mapper.Map<AccountType>(accountTypeDto);
 
             var checkExists = await _repository.AnyAsync(x => x.Name == accountType.Name);
-            if(checkExists)
+            if (checkExists)
                 return Response<AccountTypeDetailDto>.Fail("AccountType already exists.", HttpStatusCode.BadRequest, true);
 
             await _repository.AddAsync(accountType);
@@ -66,27 +61,27 @@ namespace CreditWiseHub.Service.Services
 
         public async Task<Response<List<AccountTypeDto>>> GetAll()
         {
-            var accountTypes = await _repository.GetAll().ToListAsync();
+            var accountTypes = await _repository.GetAllAsync(x => x.IsActive);
 
-            if (accountTypes is null || accountTypes.Count <= 0)
-                return Response< List < AccountTypeDto >>.Fail("AccountTypes not found.", HttpStatusCode.BadRequest, true);
-            
+            if (accountTypes is null || accountTypes.Count() <= 0)
+                return Response<List<AccountTypeDto>>.Fail("AccountTypes not found.", HttpStatusCode.BadRequest, true);
+
             var accountTypeDtos = _mapper.Map<List<AccountTypeDto>>(accountTypes);
 
-            return Response < List < AccountTypeDto >> .Success(accountTypeDtos, HttpStatusCode.OK);
+            return Response<List<AccountTypeDto>>.Success(accountTypeDtos, HttpStatusCode.OK);
         }
 
         public async Task<Response<AccountTypeDetailDto>> GetById(int id)
         {
             var accountTypeAsQueryable = _repository.Where(x => x.Id == id);
-            var accountType = await _repository.Where(x=> x.Id == id).SingleOrDefaultAsync();
+            var accountType = await _repository.Where(x => x.Id == id).SingleOrDefaultAsync();
 
             if (accountType is null)
                 return Response<AccountTypeDetailDto>.Fail("AccountType not found.", HttpStatusCode.BadRequest, true);
 
             var accountTypeDetailDto = _mapper.Map<AccountTypeDetailDto>(accountType);
 
-            accountTypeDetailDto.AccountsCount = accountTypeAsQueryable.Include(x=> x.Accounts).SelectMany(x=> x.Accounts).Count();
+            accountTypeDetailDto.AccountsCount = accountTypeAsQueryable.Include(x => x.Accounts).SelectMany(x => x.Accounts).Count();
 
             return Response<AccountTypeDetailDto>.Success(accountTypeDetailDto, HttpStatusCode.OK);
 

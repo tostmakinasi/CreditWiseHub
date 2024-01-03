@@ -11,10 +11,10 @@ namespace CreditWiseHub.Repository.Configurations
             builder.Property(x => x.Name).IsRequired().HasMaxLength(50);
             builder.Property(x => x.Surname).IsRequired().HasMaxLength(50);
             builder.Property(x => x.UserName).IsRequired().HasMaxLength(11);
-            builder.Property(x=> x.IsActive).IsRequired().HasDefaultValue(true);
-            builder.Property(x=> x.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
-            builder.HasQueryFilter(x=> x.IsActive == true);
-            
+            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
+            builder.Property(x => x.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
+            builder.HasQueryFilter(x => x.IsActive == true);
+
 
         }
     }

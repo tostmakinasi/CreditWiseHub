@@ -1,6 +1,5 @@
 ﻿using CreditWiseHub.Core.Dtos.User;
 using FluentValidation;
-using UserUserNameValidation;
 
 namespace CreditWiseHub.Service.Validations.User
 {

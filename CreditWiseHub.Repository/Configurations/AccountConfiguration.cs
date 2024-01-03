@@ -1,11 +1,6 @@
 ﻿using CreditWiseHub.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CreditWiseHub.Repository.Configurations
 {
@@ -24,11 +19,15 @@ namespace CreditWiseHub.Repository.Configurations
 
             builder.Property(e => e.AccountTypeId).IsRequired();
             builder.HasOne(e => e.AccountType)
-                .WithMany(e=> e.Accounts)
+                .WithMany(e => e.Accounts)
                 .HasForeignKey(e => e.AccountTypeId)
                 .OnDelete(DeleteBehavior.NoAction);
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
             builder.Property(x => x.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
+
+            builder.Property<uint>("Version")
+              .IsRowVersion();
+
         }
     }
 }

@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CreditWiseHub.Core.Commons;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CreditWiseHub.Core.Models
 {
-    public class UserTransactionLimit
+    public class UserTransactionLimit : IEntity
     {
         [Key]
         public string UserId { get; set; }
         public UserApp User { get; set; }
 
+        public decimal DailyTransactionLimit { get; set; }
         public decimal DailyTransactionAmount { get; set; }
+
+        public DateTime LastProcessDate { get; set; }
+
+        public decimal InstantTransactionLimit { get; set; }
     }
 }

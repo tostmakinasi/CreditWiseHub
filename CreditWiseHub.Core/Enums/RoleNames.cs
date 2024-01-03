@@ -4,6 +4,7 @@
     {
         Admin,
         User,
-        Auditor
+        Auditor,
+        CashDesk
     }
 }

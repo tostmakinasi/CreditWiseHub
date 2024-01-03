@@ -1,12 +1,11 @@
 ﻿using CreditWiseHub.Core.Abstractions.Services;
 using CreditWiseHub.Core.Dtos.AccountType;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CreditWiseHub.API.Controllers
 {
-    [Authorize(Roles ="Admin")]
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountTypesController : CustomBaseController

@@ -3,11 +3,9 @@ using CreditWiseHub.API.Middlewares;
 using CreditWiseHub.Core.Configurations;
 using CreditWiseHub.Repository.Contexts;
 using CreditWiseHub.Service.Mapping;
-using CreditWiseHub.Service.Services;
 using CreditWiseHub.Service.Validations.User;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
-using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,3 +53,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

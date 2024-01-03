@@ -24,6 +24,6 @@ namespace CreditWiseHub.API.Controllers
 
         [HttpPost]
         public async Task<IActionResult> CreateTokenByRefreshToken(RefreshTokenDto refreshTokenDto) => ActionResultInstance(await _authenticationService.CreateTokenByRefreshToken(refreshTokenDto.Token));
-        
+
     }
 }

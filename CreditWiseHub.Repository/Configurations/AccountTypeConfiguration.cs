@@ -1,11 +1,6 @@
 ﻿using CreditWiseHub.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CreditWiseHub.Repository.Configurations
 {
@@ -18,6 +13,8 @@ namespace CreditWiseHub.Repository.Configurations
             builder.Property(e => e.MinimumOpeningBalance).HasColumnType("decimal(18,2)").IsRequired();
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
             builder.Property(x => x.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
+
+            builder.HasData(new AccountType() { Id = 1, MinimumOpeningBalance = 0, CreatedDate = DateTime.UtcNow, Name = "Vadesiz Hesap", Description = "Kullanıcı ilk kayıt olurken açılan hesap türü" });
         }
     }
 }

@@ -9,7 +9,7 @@ namespace CreditWiseHub.Core.Abstractions.Services
         Task<Response<List<AccountTypeDto>>> GetAll();
         Task<Response<AccountTypeDetailDto>> GetById(int id);
         Task<Response<AccountTypeDetailDto>> CreateAsync(CreateAccountTypeDto accountTypeDto);
-        Task<Response<NoDataDto>> Update(int id,UpdateAccountTypeDto accountTypeDto);
+        Task<Response<NoDataDto>> Update(int id, UpdateAccountTypeDto accountTypeDto);
         Task<Response<NoDataDto>> Delete(int id);
     }
 }

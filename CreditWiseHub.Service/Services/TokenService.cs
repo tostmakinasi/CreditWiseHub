@@ -34,7 +34,7 @@ namespace CreditWiseHub.Service.Services
 
             };
 
-            userList.AddRange(userRoles.Select(x => new Claim(ClaimTypes.Role, x)));
+            userList.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             return userList;
         }

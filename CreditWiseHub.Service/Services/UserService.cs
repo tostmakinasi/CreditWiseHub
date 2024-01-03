@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using CreditWiseHub.Core.Abstractions.Repositories;
 using CreditWiseHub.Core.Abstractions.Services;
+using CreditWiseHub.Core.Abstractions.UnitOfWorks;
+using CreditWiseHub.Core.Configurations;
 using CreditWiseHub.Core.Dtos;
 using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Dtos.User;
@@ -7,9 +10,7 @@ using CreditWiseHub.Core.Enums;
 using CreditWiseHub.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Net;
-using System.Transactions;
 using UserUserNameValidation;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CreditWiseHub.Service.Services
 {
@@ -17,17 +18,21 @@ namespace CreditWiseHub.Service.Services
     {
         private readonly UserManager<UserApp> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IGenericRepository<UserTransactionLimit, string> _userTransactionLimitRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public UserService(UserManager<UserApp> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager)
+        public UserService(UserManager<UserApp> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager, IGenericRepository<UserTransactionLimit, string> userTransactionLimitRepository, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _mapper = mapper;
             _roleManager = roleManager;
+            _userTransactionLimitRepository = userTransactionLimitRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Response<NoDataDto>> AddRoleByTCKNAsync(string userName, RoleDto roleDto)
         {
-            
+
             var user = await _userManager.FindByNameAsync(userName);
 
             if (user is null)
@@ -35,7 +40,7 @@ namespace CreditWiseHub.Service.Services
 
             var isExistsRole = await _roleManager.RoleExistsAsync(roleDto.RoleName);
 
-            if(!isExistsRole)
+            if (!isExistsRole)
                 return Response<NoDataDto>.Fail("Role not found", HttpStatusCode.NotFound, true);
 
             var result = await _userManager.AddToRoleAsync(user, roleDto.RoleName);
@@ -62,10 +67,10 @@ namespace CreditWiseHub.Service.Services
                 }
             }
 
-            var tcknCheck = await UserNameValidationService(createUserDto);
+            //var tcknCheck = await UserNameValidationService(createUserDto);
 
-            if(!tcknCheck)
-                return Response<UserDto>.Fail("User's TCKN does not match.", HttpStatusCode.BadRequest,true);
+            //if(!tcknCheck)
+            //    return Response<UserDto>.Fail("User's TCKN does not match.", HttpStatusCode.BadRequest,true);
 
             var user = _mapper.Map<UserApp>(createUserDto);
 
@@ -78,10 +83,23 @@ namespace CreditWiseHub.Service.Services
                 return Response<UserDto>.Fail(new ErrorDto(errors, true), HttpStatusCode.BadRequest);
 
             }
-            
             await _userManager.AddToRoleAsync(user, RoleNames.User.ToString());
 
-            return Response<UserDto>.Success(_mapper.Map<UserDto>(user), HttpStatusCode.Created);
+            var userLimits = new UserTransactionLimit
+            {
+                UserId = user.Id,
+                User = user,
+                InstantTransactionLimit = DefaultsTransactionLimits.InstantTransactionLimits,
+                DailyTransactionLimit = DefaultsTransactionLimits.MonthlyTransactionLimits,
+                DailyTransactionAmount = 0
+            };
+
+            await _userTransactionLimitRepository.AddAsync(userLimits);
+            await _unitOfWork.CommitAsync();
+
+            var userDto = _mapper.Map<UserDto>(user);
+
+            return Response<UserDto>.Success(userDto, HttpStatusCode.Created);
         }
 
         public async Task<Response<UserDto>> GetByTCKNAsync(string userName)
@@ -115,7 +133,7 @@ namespace CreditWiseHub.Service.Services
 
             user.Email = updateUserDto.Email;
 
-            await _userManager.UpdateNormalizedEmailAsync(user);
+            await _userManager.UpdateAsync(user);
 
             return Response<NoDataDto>.Success(HttpStatusCode.OK);
         }
@@ -128,7 +146,7 @@ namespace CreditWiseHub.Service.Services
                 return Response<NoDataDto>.Fail("User not found", HttpStatusCode.NotFound, true);
 
             user.IsActive = false;
-            
+
             var result = await _userManager.UpdateAsync(user);
 
             if (!result.Succeeded)

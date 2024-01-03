@@ -32,12 +32,11 @@ namespace CreditWiseHub.Repository.UnitOfWorks
         {
             try
             {
-                await _context.SaveChangesAsync();
-                _transaction.Commit();
+                await _transaction.CommitAsync();
             }
             catch (Exception)
             {
-                _transaction.Rollback();
+                await _transaction.RollbackAsync();
                 throw;
             }
             finally

@@ -1,13 +1,9 @@
-﻿using CreditWiseHub.Core.Abstractions.Repositories;
-using CreditWiseHub.Core.Abstractions.Services;
-using CreditWiseHub.Core.Abstractions.UnitOfWorks;
-using CreditWiseHub.Core.Configurations;
+﻿using CreditWiseHub.Core.Configurations;
 using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Models;
 using CreditWiseHub.Repository.Contexts;
-using CreditWiseHub.Repository.Repositories;
-using CreditWiseHub.Repository.UnitOfWorks;
-using CreditWiseHub.Service.Services;
+using CreditWiseHub.Repository.Extensions;
+using CreditWiseHub.Service.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,12 +17,9 @@ namespace CreditWiseHub.API.Extensions
     {
         public static IServiceCollection AddScopedWithExtension(this IServiceCollection services)
         {
-            services.AddScoped<IAuthenticationService, AuthenticationService>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<ITokenService, TokenService>();
-            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IAccountTypeService, AccountTypeService>();
+            services.AddServicesWithExtension();
+            services.AddRepositoriesWithExtension();
+
             return services;
         }
 
@@ -46,7 +39,7 @@ namespace CreditWiseHub.API.Extensions
 
             }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(tokenOptions.SecurityKey)),

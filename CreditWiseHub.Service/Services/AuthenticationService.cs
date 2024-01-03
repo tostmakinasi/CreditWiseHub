@@ -17,9 +17,9 @@ namespace CreditWiseHub.Service.Services
         private readonly ITokenService _tokenService;
         private readonly UserManager<UserApp> _userManager;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IGenericRepository<UserRefreshToken> _userRefreshTokenRepository;
+        private readonly IGenericRepository<UserRefreshToken, string> _userRefreshTokenRepository;
 
-        public AuthenticationService(ITokenService tokenService, UserManager<UserApp> userManager, IUnitOfWork unitOfWork, IGenericRepository<UserRefreshToken> userRefreshTokenRepository)
+        public AuthenticationService(ITokenService tokenService, UserManager<UserApp> userManager, IUnitOfWork unitOfWork, IGenericRepository<UserRefreshToken, string> userRefreshTokenRepository)
         {
             _tokenService = tokenService;
             _userManager = userManager;

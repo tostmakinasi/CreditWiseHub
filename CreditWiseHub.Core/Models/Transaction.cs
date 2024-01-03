@@ -1,29 +1,13 @@
-﻿using CreditWiseHub.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CreditWiseHub.Core.Commons;
 
 namespace CreditWiseHub.Core.Models
 {
-    public class Transaction
+    public class Transaction : BaseEntity<long>
     {
-        public int TransactionId { get; set; }
 
         public decimal Amount { get; set; }
-
         public DateTime TransactionDate { get; set; }
-
-        public TransactionType Type { get; set; }
-
-        public bool Is { get; set; }
-
-        public int? SenderAccountId { get; set; }
-
-        public virtual Account Account { get; set; }
-
-
+        public bool IsConfirmed { get; set; }
+        public List<TransactionAffectedAccount> AffectedAccounts { get; set; }
     }
 }
