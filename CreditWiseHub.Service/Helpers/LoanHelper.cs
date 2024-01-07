@@ -40,7 +40,7 @@ namespace CreditWiseHub.Service.Helpers
             double paidAmount = 0;//ot
             DateTime paymentDate = _paymentStartDate;
             double installment = 0;
-            //List<PaymentPlanDto> paymentPlan = new List<PaymentPlanDto>();
+            
 
             do
             {
@@ -73,7 +73,6 @@ namespace CreditWiseHub.Service.Helpers
                 paymentDate = paymentDate.AddMonths(1);
             } while (_remainingPrincipalDebt > 0);
 
-            //return paymentPlan;
         }
 
         public double MonthlyInstallmentCalculate()
