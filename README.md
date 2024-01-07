@@ -1,5 +1,12 @@
 # FinalCase
 
+<p align="center">
+  <img src="./_ca5cb410-fb83-439d-963f-317523b33512.jpeg" align =center width="400">
+
+</p>
+
+# [Click for Postman API documentation](https://documenter.getpostman.com/view/28275528/2s9YsJAXVi) 
+
 
 # CreditWise Hub 
 
