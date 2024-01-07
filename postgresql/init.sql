@@ -18,31 +18,14 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-DROP DATABASE "CreditWiseHubDB";
---
--- TOC entry 3517 (class 1262 OID 16729)
--- Name: CreditWiseHubDB; Type: DATABASE; Schema: -; Owner: admin
---
 
 CREATE DATABASE "CreditWiseHubDB" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.utf8';
 
 
-DROP DATABASE "HangfireDB";
-
-CREATE DATABASE "HangfireDB"
-    WITH
-    OWNER = admin
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'en_US.utf8'
-    LC_CTYPE = 'en_US.utf8'
-    LOCALE_PROVIDER = 'libc'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1
-    IS_TEMPLATE = False;
-
 ALTER DATABASE "CreditWiseHubDB" OWNER TO admin;
 
 \connect "CreditWiseHubDB"
+
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -583,6 +566,353 @@ CREATE TABLE public."__EFMigrationsHistory" (
 ALTER TABLE public."__EFMigrationsHistory" OWNER TO admin;
 
 --
+-- TOC entry 3514 (class 0 OID 16736)
+-- Dependencies: 217
+-- Data for Name: AccountTypes; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."AccountTypes" ("Id", "Name", "MinimumOpeningBalance", "Description", "CreatedDate", "UpdatedDate", "IsActive") FROM stdin;
+4	Genç Hesabı	1000.00	Bankacılıkla yeni tanışan gençler için <3	2024-01-07 08:19:21.413276+00	\N	t
+1	Vadesiz Hesap	0.00	Kullanıcı ilk kayıt olurken açılan hesap türü	2024-01-07 09:50:44.219254+00	\N	t
+2	Vadeli Hesap	150.00	Vadeli mevduat hesabı	2024-01-07 09:50:44.219255+00	\N	f
+3	Arı Hesap	100.00	Günlük vadeli mevduat hesabı	2024-01-07 09:50:44.219255+00	\N	t
+\.
+
+
+--
+-- TOC entry 3526 (class 0 OID 16799)
+-- Dependencies: 229
+-- Data for Name: Accounts; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."Accounts" ("Id", "AccountNumber", "Name", "Description", "Balance", "UserAppId", "AccountTypeId", "CreatedDate", "UpdatedDate", "IsActive") FROM stdin;
+37c71b97-5874-456a-b170-2339b7148225	33A5CD993A	Default Account	Default account for the user	0	8e4d5a64-259a-4386-8fb7-56ba27272ff9	1	2024-01-06 23:47:47.453182+00	\N	t
+02d01fcb-107b-4b2d-8856-9a6338371f7f	483D93FE29	Default Account	Default account for the user	0	5bb46e15-49fc-4799-9284-bc1fcee8d683	1	2024-01-06 23:47:48.360587+00	\N	t
+38e20d26-53d2-4b67-859a-593d341f6f68	B67EDCB1B5	Default Account	Default account for the user	0	be945ee1-85cb-428e-ab11-53afa4045446	1	2024-01-06 23:47:48.952747+00	\N	t
+e7982212-f7a6-471d-9333-13c64b6f7592	C712E3569D	Default Account	Default account for the user	0	5a26d71e-86ab-4d0c-a3ef-397f8e1dafcc	1	2024-01-06 23:47:49.385825+00	\N	t
+28037902-b020-45e8-b7f8-e29a1767b354	1187A61E86	Default Account	Default account for the user	55000.00	abb2add5-a2fa-4983-935f-c060e3c8eff6	1	2024-01-06 23:47:47.9739+00	2024-01-07 09:38:11.472845+00	t
+\.
+
+
+--
+-- TOC entry 3536 (class 0 OID 16898)
+-- Dependencies: 239
+-- Data for Name: AffectedAccounts; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."AffectedAccounts" ("Id", "AccountNumber", "Description", "IsReceiverAccount", "IsExternal", "BeforeBalance", "AfterBalance", "TransactionId") FROM stdin;
+4	1187A61E86	Onaylanan Kredi Tutarı Hesaba Aktarımı	t	\N	0.00	55000.00	4
+\.
+
+
+--
+-- TOC entry 3525 (class 0 OID 16787)
+-- Dependencies: 228
+-- Data for Name: AspNetRoleClaims; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."AspNetRoleClaims" ("Id", "RoleId", "ClaimType", "ClaimValue") FROM stdin;
+\.
+
+
+--
+-- TOC entry 3515 (class 0 OID 16743)
+-- Dependencies: 218
+-- Data for Name: AspNetRoles; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."AspNetRoles" ("Id", "Name", "NormalizedName", "ConcurrencyStamp") FROM stdin;
+264a2e72-de17-465b-ae4d-ee47443df401	Admin	ADMIN	\N
+5f1c37ad-0c1a-4672-9c5d-c0c9beb6fd82	User	USER	\N
+9adae364-58c3-4edf-a393-8b9a93dcbdc2	Auditor	AUDITOR	\N
+5137b669-10f3-4cc0-b9c2-b7ee0a8e3d72	CashDesk	CASHDESK	\N
+d06c0d7e-0728-4c19-af9f-d0362fc075f6	CustomerService	CUSTOMERSERVICE	\N
+\.
+
+
+--
+-- TOC entry 3528 (class 0 OID 16819)
+-- Dependencies: 231
+-- Data for Name: AspNetUserClaims; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."AspNetUserClaims" ("Id", "UserId", "ClaimType", "ClaimValue") FROM stdin;
+\.
+
+
+--
+-- TOC entry 3529 (class 0 OID 16831)
+-- Dependencies: 232
+-- Data for Name: AspNetUserLogins; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."AspNetUserLogins" ("LoginProvider", "ProviderKey", "ProviderDisplayName", "UserId") FROM stdin;
+\.
+
+
+--
+-- TOC entry 3530 (class 0 OID 16843)
+-- Dependencies: 233
+-- Data for Name: AspNetUserRoles; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."AspNetUserRoles" ("UserId", "RoleId") FROM stdin;
+8e4d5a64-259a-4386-8fb7-56ba27272ff9	264a2e72-de17-465b-ae4d-ee47443df401
+abb2add5-a2fa-4983-935f-c060e3c8eff6	5f1c37ad-0c1a-4672-9c5d-c0c9beb6fd82
+5bb46e15-49fc-4799-9284-bc1fcee8d683	9adae364-58c3-4edf-a393-8b9a93dcbdc2
+be945ee1-85cb-428e-ab11-53afa4045446	5137b669-10f3-4cc0-b9c2-b7ee0a8e3d72
+5a26d71e-86ab-4d0c-a3ef-397f8e1dafcc	d06c0d7e-0728-4c19-af9f-d0362fc075f6
+\.
+
+
+--
+-- TOC entry 3531 (class 0 OID 16860)
+-- Dependencies: 234
+-- Data for Name: AspNetUserTokens; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."AspNetUserTokens" ("UserId", "LoginProvider", "Name", "Value") FROM stdin;
+\.
+
+
+--
+-- TOC entry 3516 (class 0 OID 16750)
+-- Dependencies: 219
+-- Data for Name: AspNetUsers; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."AspNetUsers" ("Id", "Name", "Surname", "DateOfBirth", "IsActive", "CreatedDate", "UpdatedDate", "UserName", "NormalizedUserName", "Email", "NormalizedEmail", "EmailConfirmed", "PasswordHash", "SecurityStamp", "ConcurrencyStamp", "PhoneNumber", "PhoneNumberConfirmed", "TwoFactorEnabled", "LockoutEnd", "LockoutEnabled", "AccessFailedCount") FROM stdin;
+8e4d5a64-259a-4386-8fb7-56ba27272ff9	Admin	User	1990-01-01 00:00:00+00	t	2024-01-06 23:47:46.666038+00	\N	AdminUser123	ADMINUSER123	admin@example.com	ADMIN@EXAMPLE.COM	f	AQAAAAIAAYagAAAAEO/VzWEHqc+jwzmfJlLZ8eiSzCFPVqLOI06jJ7xvgFURI5uBmOGCRBDJfrDtsWljsw==	I3RXFMALMN43QCRMTJ5USY7QCTCCYDDE	6d65a73d-8cca-4a7e-8519-c81cc4f171db	\N	f	f	\N	t	0
+abb2add5-a2fa-4983-935f-c060e3c8eff6	User	User	1995-05-05 00:00:00+00	t	2024-01-06 23:47:46.666103+00	\N	User123456789	USER123456789	user@example.com	USER@EXAMPLE.COM	f	AQAAAAIAAYagAAAAEOaPY5fiyqSSZgDxJ7wb0kuyNGA/Fisfvr1BSCgo+WjfGshAl1ytbGNaL8y3S/snfg==	HAF7K5ZD7SKVH6PSPSTSQVHPXFHHJGHI	f35e2c46-da00-4245-96be-4afb42465ffe	\N	f	f	\N	t	0
+5bb46e15-49fc-4799-9284-bc1fcee8d683	Auditor	User	1985-10-10 00:00:00+00	t	2024-01-06 23:47:46.666107+00	\N	Auditor987654321	AUDITOR987654321	auditor@example.com	AUDITOR@EXAMPLE.COM	f	AQAAAAIAAYagAAAAELe6glno0juT10/284V/NFyBLnBjBLANlFQa5WGcxleHrujbc43zbAlwU/nTPiyj1w==	NMATMO5JVDU52KDG3Z3LHM6CKZSRIPYU	5ebd40d5-cbee-4db9-b2c5-35bcd3dcbf77	\N	f	f	\N	t	0
+be945ee1-85cb-428e-ab11-53afa4045446	CashDesk	User	1980-03-15 00:00:00+00	t	2024-01-06 23:47:46.66611+00	\N	CashDeskUser112233	CASHDESKUSER112233	cashdesk@example.com	CASHDESK@EXAMPLE.COM	f	AQAAAAIAAYagAAAAEJ+Zd8RYS2Z7sGAJeE6yLNIx8vZomn4cUcVwLdEWZphC3S6c2xcO3XxB2BWekyy7rA==	OW5UEF4MEKG6LEB2DHWMEZWLSMELG5VV	47ce11b8-d634-4899-9e9d-4c9064504bb5	\N	f	f	\N	t	0
+5a26d71e-86ab-4d0c-a3ef-397f8e1dafcc	CustomerService	User	1992-08-20 00:00:00+00	t	2024-01-06 23:47:46.666114+00	\N	CustomerServiceUser445566	CUSTOMERSERVICEUSER445566	customerservice@example.com	CUSTOMERSERVICE@EXAMPLE.COM	f	AQAAAAIAAYagAAAAEDfiyzE4zlKt329enw8c2uIYShjUIGf7x9tma8coScIdC69HlRh71Z0d0gPzh9KDlg==	PWEKDMN2C4NBLNVQCFMO3DFZFUE673OR	832eeb7a-2726-4c40-a175-a7257d3b230d	\N	f	f	\N	t	0
+\.
+
+
+--
+-- TOC entry 3540 (class 0 OID 16934)
+-- Dependencies: 243
+-- Data for Name: AutomaticPaymentHistories; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."AutomaticPaymentHistories" ("Id", "RegistrationId", "Comment", "PaymentDate", "PaymentAmount", "IsPaid", "TransactionId") FROM stdin;
+\.
+
+
+--
+-- TOC entry 3533 (class 0 OID 16873)
+-- Dependencies: 236
+-- Data for Name: AutomaticPaymentRegistrations; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."AutomaticPaymentRegistrations" ("Id", "Name", "PaymentType", "PaymentAmount", "PaymentDueDay", "PaymentDueCount", "PaymentDuePaidCount", "IsActive", "UserId", "BelongToSystem") FROM stdin;
+1	Telefon Faturası	2	150.00	2	10	0	f	abb2add5-a2fa-4983-935f-c060e3c8eff6	f
+2	Otomatik Kredi Taksit Tahsilatı	1	6781.00	7	10	0	t	abb2add5-a2fa-4983-935f-c060e3c8eff6	t
+\.
+
+
+--
+-- TOC entry 3518 (class 0 OID 16760)
+-- Dependencies: 221
+-- Data for Name: ExternalAccountInformations; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."ExternalAccountInformations" ("Id", "AccountNumber", "BankName", "OwnerFullName") FROM stdin;
+\.
+
+
+--
+-- TOC entry 3538 (class 0 OID 16911)
+-- Dependencies: 241
+-- Data for Name: LoanApplications; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."LoanApplications" ("Id", "UserId", "LoanTypeId", "RequestedAmount", "InstallmentCount", "IsRejected", "IsApproved", "ApproverId", "ApprovalDate", "TransactionId", "CreatedDate", "UpdatedDate", "IsActive") FROM stdin;
+1	abb2add5-a2fa-4983-935f-c060e3c8eff6	1	55000.00	10	f	t	5bb46e15-49fc-4799-9284-bc1fcee8d683	2024-01-07 09:38:06.934576+00	4	2024-01-07 08:43:24.127047+00	\N	f
+\.
+
+
+--
+-- TOC entry 3520 (class 0 OID 16768)
+-- Dependencies: 223
+-- Data for Name: LoanTypes; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."LoanTypes" ("Id", "Name", "InterestRate", "MaxInstallmentOption", "MinInstallmentOption", "MinLoanAmount", "MaxLoanAmount", "MinCreditScore", "MaxCreditScore", "CreatedDate", "UpdatedDate", "IsActive") FROM stdin;
+1	İhtiyaç Kredisi	4.00	12	4	0.00	0.00	100	500	-infinity	\N	t
+2	Ev Kredisi	10.00	36	4	0.00	0.00	600	1000	-infinity	\N	t
+3	Araç Kredisi	0.00	48	24	500000.00	1000000.00	900	1000	2024-01-07 00:26:36.342351+00	2024-01-07 00:31:23.985804+00	f
+\.
+
+
+--
+-- TOC entry 3542 (class 0 OID 16975)
+-- Dependencies: 245
+-- Data for Name: Tickets; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."Tickets" ("Id", "Title", "Description", "ResolvedDate", "Status", "Priority", "UserAppId", "CreatedDate", "UpdatedDate", "IsActive") FROM stdin;
+2	Deneme İsteği	Hesaplarımda garip şeyler oluyor yardım lütfen	\N	1	1	abb2add5-a2fa-4983-935f-c060e3c8eff6	2024-01-07 09:58:05.035023+00	\N	t
+4	Deneme İsteği	Hesaplarımda garip şeyler oluyor yardım lütfen	\N	1	1	abb2add5-a2fa-4983-935f-c060e3c8eff6	2024-01-07 10:05:14.897608+00	\N	t
+1	Deneme İsteği	Hesaplarımda garip şeyler oluyor yardım lütfen	2024-01-07 10:31:21.765797+00	3	2	abb2add5-a2fa-4983-935f-c060e3c8eff6	2024-01-07 09:55:06.587807+00	2024-01-07 10:31:21.787394+00	f
+\.
+
+
+--
+-- TOC entry 3522 (class 0 OID 16774)
+-- Dependencies: 225
+-- Data for Name: Transactions; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."Transactions" ("Id", "Amount", "TransactionDate", "IsConfirmed") FROM stdin;
+4	55000.00	2024-01-07 09:38:11.278069+00	t
+\.
+
+
+--
+-- TOC entry 3523 (class 0 OID 16779)
+-- Dependencies: 226
+-- Data for Name: UserRefreshTokens; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."UserRefreshTokens" ("UserId", "Code", "Expiration") FROM stdin;
+8e4d5a64-259a-4386-8fb7-56ba27272ff9	qLB0FrPjWw9aPdzrCIUJQGWaCOmUoaqDdb1HwRAwKbI=	2024-01-07 08:29:10.436775+00
+be945ee1-85cb-428e-ab11-53afa4045446	yGO8YR84U7w6lQgB0Xmkyt22JdXFOiMGjcLrfQR9qCo=	2024-01-07 17:00:51.105434+00
+5bb46e15-49fc-4799-9284-bc1fcee8d683	YVYa82p/dcIZA0mcISXFVi8ZhO1zRhf667xNi5UZHt8=	2024-01-07 17:03:49.877578+00
+abb2add5-a2fa-4983-935f-c060e3c8eff6	TNeQkGe9wzYn56USu3P+IpGSlnKxqx447psSdvZX8kY=	2024-01-07 18:04:25.653331+00
+5a26d71e-86ab-4d0c-a3ef-397f8e1dafcc	c0vJC/ITfUYx3wlI2HXhqGLAYMRcNy3PaCaKGfmpuwg=	2024-01-07 18:27:03.562563+00
+\.
+
+
+--
+-- TOC entry 3534 (class 0 OID 16885)
+-- Dependencies: 237
+-- Data for Name: UserTransactionLimits; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."UserTransactionLimits" ("UserId", "DailyTransactionLimit", "DailyTransactionAmount", "LastProcessDate", "InstantTransactionLimit") FROM stdin;
+8e4d5a64-259a-4386-8fb7-56ba27272ff9	1000000.00	0.00	2024-01-06 23:47:47.323909+00	5000.00
+abb2add5-a2fa-4983-935f-c060e3c8eff6	1000000.00	0.00	2024-01-06 23:47:47.960588+00	5000.00
+5bb46e15-49fc-4799-9284-bc1fcee8d683	1000000.00	0.00	2024-01-06 23:47:48.330434+00	5000.00
+be945ee1-85cb-428e-ab11-53afa4045446	1000000.00	0.00	2024-01-06 23:47:48.8824+00	5000.00
+5a26d71e-86ab-4d0c-a3ef-397f8e1dafcc	1000000.00	0.00	2024-01-06 23:47:49.375942+00	5000.00
+\.
+
+
+--
+-- TOC entry 3512 (class 0 OID 16730)
+-- Dependencies: 215
+-- Data for Name: __EFMigrationsHistory; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public."__EFMigrationsHistory" ("MigrationId", "ProductVersion") FROM stdin;
+20240106221118_Initial	7.0.14
+20240106222912_deneme	7.0.14
+20240107095044_CustometTickets	7.0.14
+\.
+
+
+--
+-- TOC entry 3548 (class 0 OID 0)
+-- Dependencies: 216
+-- Name: AccountTypes_Id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('public."AccountTypes_Id_seq"', 4, true);
+
+
+--
+-- TOC entry 3549 (class 0 OID 0)
+-- Dependencies: 238
+-- Name: AffectedAccounts_Id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('public."AffectedAccounts_Id_seq"', 4, true);
+
+
+--
+-- TOC entry 3550 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: AspNetRoleClaims_Id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('public."AspNetRoleClaims_Id_seq"', 1, false);
+
+
+--
+-- TOC entry 3551 (class 0 OID 0)
+-- Dependencies: 230
+-- Name: AspNetUserClaims_Id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('public."AspNetUserClaims_Id_seq"', 1, false);
+
+
+--
+-- TOC entry 3552 (class 0 OID 0)
+-- Dependencies: 242
+-- Name: AutomaticPaymentHistories_Id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('public."AutomaticPaymentHistories_Id_seq"', 1, false);
+
+
+--
+-- TOC entry 3553 (class 0 OID 0)
+-- Dependencies: 235
+-- Name: AutomaticPaymentRegistrations_Id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('public."AutomaticPaymentRegistrations_Id_seq"', 2, true);
+
+
+--
+-- TOC entry 3554 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: ExternalAccountInformations_Id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('public."ExternalAccountInformations_Id_seq"', 1, false);
+
+
+--
+-- TOC entry 3555 (class 0 OID 0)
+-- Dependencies: 240
+-- Name: LoanApplications_Id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('public."LoanApplications_Id_seq"', 1, true);
+
+
+--
+-- TOC entry 3556 (class 0 OID 0)
+-- Dependencies: 222
+-- Name: LoanTypes_Id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('public."LoanTypes_Id_seq"', 3, true);
+
+
+--
+-- TOC entry 3557 (class 0 OID 0)
+-- Dependencies: 244
+-- Name: Tickets_Id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('public."Tickets_Id_seq"', 4, true);
+
+
+--
+-- TOC entry 3558 (class 0 OID 0)
+-- Dependencies: 224
+-- Name: Transactions_Id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
+--
+
+SELECT pg_catalog.setval('public."Transactions_Id_seq"', 4, true);
+
+
+--
 -- TOC entry 3298 (class 2606 OID 16742)
 -- Name: AccountTypes PK_AccountTypes; Type: CONSTRAINT; Schema: public; Owner: admin
 --
@@ -1051,7 +1381,7 @@ ALTER TABLE ONLY public."UserTransactionLimits"
     ADD CONSTRAINT "FK_UserTransactionLimits_AspNetUsers_UserId" FOREIGN KEY ("UserId") REFERENCES public."AspNetUsers"("Id") ON DELETE CASCADE;
 
 
--- Completed on 2024-01-07 12:27:48 UTC
+-- Completed on 2024-01-07 12:29:54 UTC
 
 --
 -- PostgreSQL database dump complete
