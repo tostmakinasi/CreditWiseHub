@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CreditWiseHub.API.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/v1/[controller]/[action]")]
     [ApiController]
     public class AuthController : CustomBaseController
     {

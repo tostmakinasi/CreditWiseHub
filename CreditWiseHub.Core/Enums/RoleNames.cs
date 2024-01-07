@@ -5,6 +5,7 @@
         Admin,
         User,
         Auditor,
-        CashDesk
+        CashDesk,
+        CustomerService
     }
 }

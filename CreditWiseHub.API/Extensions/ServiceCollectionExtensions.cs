@@ -4,6 +4,8 @@ using CreditWiseHub.Core.Models;
 using CreditWiseHub.Repository.Contexts;
 using CreditWiseHub.Repository.Extensions;
 using CreditWiseHub.Service.Extensions;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -71,5 +73,6 @@ namespace CreditWiseHub.API.Extensions
 
             return services;
         }
+
     }
 }

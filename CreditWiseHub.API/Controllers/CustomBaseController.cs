@@ -1,9 +1,10 @@
 ﻿using CreditWiseHub.Core.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CreditWiseHub.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class CustomBaseController : ControllerBase
     {
@@ -12,5 +13,10 @@ namespace CreditWiseHub.API.Controllers
         {
             StatusCode = response.StatusCode
         };
+
+        protected string GetAutUserId()
+        {
+            return HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        }
     }
 }

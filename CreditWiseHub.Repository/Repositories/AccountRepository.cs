@@ -20,9 +20,11 @@ namespace CreditWiseHub.Repository.Repositories
 
         public async Task<Account?> GetAccountByAccountNumber(string accountNumber)
         {
-            var account = await _dbSet.Where(x => x.AccountNumber == accountNumber).FirstOrDefaultAsync();
+            var account = await _dbSet.Where(x => x.AccountNumber == accountNumber).Include(x=> x.AccountType).Include(x=> x.UserApp).FirstOrDefaultAsync();
             return account;
         }
+
+
 
         public async Task<string> GetAccountHolderFullNameByAccountNumber(string accountNumber)
         {
@@ -33,7 +35,7 @@ namespace CreditWiseHub.Repository.Repositories
 
         public async Task<List<Account>> GetAccountsByUsername(string username)
         {
-            var accounts = await _dbSet.Include(x => x.UserApp).Where(x => x.UserApp.UserName == username).ToListAsync();
+            var accounts = await _dbSet.Include(x => x.UserApp).Where(x => x.UserApp.UserName == username).Include(x => x.AccountType).ToListAsync();
             return accounts;
         }
 

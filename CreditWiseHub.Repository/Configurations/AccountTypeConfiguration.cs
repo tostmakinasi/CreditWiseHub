@@ -14,7 +14,31 @@ namespace CreditWiseHub.Repository.Configurations
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
             builder.Property(x => x.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
 
-            builder.HasData(new AccountType() { Id = 1, MinimumOpeningBalance = 0, CreatedDate = DateTime.UtcNow, Name = "Vadesiz Hesap", Description = "Kullanıcı ilk kayıt olurken açılan hesap türü" });
+            builder.HasData(
+                new AccountType
+                { 
+                    Id = 1,
+                    MinimumOpeningBalance = 0, 
+                    CreatedDate = DateTime.UtcNow, 
+                    Name = "Vadesiz Hesap", 
+                    Description = "Kullanıcı ilk kayıt olurken açılan hesap türü" 
+                },
+                new AccountType
+                {
+                    Id = 2,
+                    Name = "Vadeli Hesap",
+                    MinimumOpeningBalance = 500,
+                    Description = "Vadeli mevduat hesabı",
+                    CreatedDate = DateTime.UtcNow,
+                },
+                new AccountType
+                {
+                    Id = 3,
+                    Name = "Arı Hesap",
+                    MinimumOpeningBalance = 100,
+                    Description = "Günlük vadeli mevduat hesabı",
+                    CreatedDate = DateTime.UtcNow,
+                });
         }
     }
 }

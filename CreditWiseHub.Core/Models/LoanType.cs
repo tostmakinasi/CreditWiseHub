@@ -10,6 +10,7 @@ namespace CreditWiseHub.Core.Models
     public class LoanType:BaseAuditableEntity<int>
     {
         public string Name { get; set; }
+        public decimal InterestRate { get; set; }
         public int MaxInstallmentOption { get; set; }
         public int MinInstallmentOption { get; set; }
         public decimal MinLoanAmount { get; set; }

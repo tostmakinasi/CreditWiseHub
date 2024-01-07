@@ -25,14 +25,14 @@ namespace CreditWiseHub.Service.Services
             _mapper = mapper;
         }
 
-        public async Task<Response<TransactionStatusDto>> AddDepositWithdrawalProcess(Account account, decimal amount, bool isNewOpening = false, TransactionType transactionType = TransactionType.Deposit, bool preApproval = true)
+        public async Task<Response<TransactionStatusDto>> AddDepositWithdrawalProcess(Account account, decimal amount,string description = "", bool isNewOpening = false, TransactionType transactionType = TransactionType.Deposit, bool preApproval = true)
         {
 
             var transaction = await CreateTransaction(amount, preApproval);
             var affectedAccount = await CreateAffectedAccount(account, amount, transactionType, transaction);
 
-            if (isNewOpening)
-                affectedAccount.Description = "Hesap Açılışı İçin Gereken Tutar Yatırma İşlemi";
+            if (!string.IsNullOrEmpty(description))
+                affectedAccount.Description = description;
 
             await _affectedAccountRepository.AddAsync(affectedAccount);
             await _unitOfWork.CommitAsync();
@@ -88,7 +88,7 @@ namespace CreditWiseHub.Service.Services
 
             var affectedReceiverAccount = await CreateAffectedAccount(receiverAccount, transferDto.Amount, TransactionType.ExternalTransfer, transaction, true, transferDto.AccountInformation.AccountHolderFullName);
 
-            var affectedSenderAccount = await CreateAffectedAccount(senderAccount, transferDto.Amount, TransactionType.InternalTransfer, null, false);
+            var affectedSenderAccount = await CreateAffectedAccount(senderAccount, transferDto.Amount, TransactionType.InternalTransfer, transaction, false);
             //TransactionAffectedAccount affectedReceiverAccount = new()
             //{
             //    IsReceiverAccount = true,

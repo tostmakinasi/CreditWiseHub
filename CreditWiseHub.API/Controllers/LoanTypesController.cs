@@ -9,7 +9,7 @@ using System.Data;
 namespace CreditWiseHub.API.Controllers
 {
     [Authorize(Roles = "Admin")]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class LoanTypesController : CustomBaseController
     {
@@ -20,6 +20,7 @@ namespace CreditWiseHub.API.Controllers
             _loanTypeService = loanTypeService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll() => ActionResultInstance(await _loanTypeService.GetAllLoanTypesAsync());
 

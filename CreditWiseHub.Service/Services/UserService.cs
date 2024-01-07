@@ -4,12 +4,15 @@ using CreditWiseHub.Core.Abstractions.Services;
 using CreditWiseHub.Core.Abstractions.UnitOfWorks;
 using CreditWiseHub.Core.Configurations;
 using CreditWiseHub.Core.Dtos;
+using CreditWiseHub.Core.Dtos.Account;
 using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Dtos.User;
 using CreditWiseHub.Core.Enums;
 using CreditWiseHub.Core.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
+using System.Runtime.CompilerServices;
 using UserUserNameValidation;
 
 namespace CreditWiseHub.Service.Services
@@ -19,15 +22,17 @@ namespace CreditWiseHub.Service.Services
         private readonly UserManager<UserApp> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IGenericRepository<UserTransactionLimit, string> _userTransactionLimitRepository;
+        private readonly IAccountService _accountService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public UserService(UserManager<UserApp> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager, IGenericRepository<UserTransactionLimit, string> userTransactionLimitRepository, IUnitOfWork unitOfWork)
+        public UserService(UserManager<UserApp> userManager, IMapper mapper, RoleManager<IdentityRole> roleManager, IGenericRepository<UserTransactionLimit, string> userTransactionLimitRepository, IUnitOfWork unitOfWork, IAccountService accountService)
         {
             _userManager = userManager;
             _mapper = mapper;
             _roleManager = roleManager;
             _userTransactionLimitRepository = userTransactionLimitRepository;
             _unitOfWork = unitOfWork;
+            _accountService = accountService;
         }
 
         public async Task<Response<NoDataDto>> AddRoleByTCKNAsync(string userName, RoleDto roleDto)
@@ -42,6 +47,17 @@ namespace CreditWiseHub.Service.Services
 
             if (!isExistsRole)
                 return Response<NoDataDto>.Fail("Role not found", HttpStatusCode.NotFound, true);
+
+            var existingRoles = await _userManager.GetRolesAsync(user);
+            if (existingRoles.Any())
+            {
+                var removeRolesResult = await _userManager.RemoveFromRolesAsync(user, existingRoles);
+                if (!removeRolesResult.Succeeded)
+                {
+                    var removeErrors = removeRolesResult.Errors.Select(x => x.Description).ToList();
+                    return Response<NoDataDto>.Fail(new ErrorDto(removeErrors, false), HttpStatusCode.InternalServerError);
+                }
+            }
 
             var result = await _userManager.AddToRoleAsync(user, roleDto.RoleName);
 
@@ -58,15 +74,6 @@ namespace CreditWiseHub.Service.Services
 
         public async Task<Response<UserDto>> CreateAsync(CreateUserDto createUserDto)
         {
-            var isExistsRole = await _roleManager.RoleExistsAsync(RoleNames.User.ToString());
-            if (!isExistsRole)
-            {
-                foreach (var role in Enum.GetNames(typeof(RoleNames)))
-                {
-                    await _roleManager.CreateAsync(new IdentityRole { Name = role.ToString() });
-                }
-            }
-
             //var tcknCheck = await UserNameValidationService(createUserDto);
 
             //if(!tcknCheck)
@@ -91,24 +98,35 @@ namespace CreditWiseHub.Service.Services
                 User = user,
                 InstantTransactionLimit = DefaultsTransactionLimits.InstantTransactionLimits,
                 DailyTransactionLimit = DefaultsTransactionLimits.MonthlyTransactionLimits,
-                DailyTransactionAmount = 0
+                DailyTransactionAmount = 0,
+                LastProcessDate = DateTime.UtcNow,
             };
 
             await _userTransactionLimitRepository.AddAsync(userLimits);
             await _unitOfWork.CommitAsync();
 
+            var defaultAccount = new CreateAccountDto {
+                Name = "Vadesiz Hesap",
+                OpeningBalance = 0,
+                AccountTypeId = 1,
+                Description = ""
+            };
+            var accountInfo = await _accountService.CreateByUserName(user.UserName, defaultAccount);
+
+
             var userDto = _mapper.Map<UserDto>(user);
+            userDto.DefaultAccountNumber = accountInfo.Data.AccountNumber;
 
             return Response<UserDto>.Success(userDto, HttpStatusCode.Created);
         }
 
         public async Task<Response<UserDto>> GetByTCKNAsync(string userName)
         {
-            var user = await _userManager.FindByNameAsync(userName);
+            var user = await _userManager.Users.Include(x=> x.Accounts).Where(x=> x.UserName == userName).FirstOrDefaultAsync();
 
             if (user is null)
                 return Response<UserDto>.Fail("User not found", HttpStatusCode.NotFound, true);
-
+            
             return Response<UserDto>.Success(_mapper.Map<UserDto>(user), HttpStatusCode.OK);
         }
 

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CreditWiseHub.API.Controllers
 {
     [Authorize(Roles = "Admin")]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class AccountTypesController : CustomBaseController
     {
@@ -17,6 +17,7 @@ namespace CreditWiseHub.API.Controllers
             _accountTypeService = accountTypeService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll() => ActionResultInstance(await _accountTypeService.GetAll());
 

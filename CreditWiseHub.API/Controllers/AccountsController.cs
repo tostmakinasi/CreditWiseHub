@@ -1,5 +1,6 @@
 ﻿using CreditWiseHub.API.Filters;
 using CreditWiseHub.Core.Abstractions.Services;
+using CreditWiseHub.Core.Dtos.Account;
 using CreditWiseHub.Core.Dtos.Transactions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CreditWiseHub.API.Controllers
 {
 
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class AccountsController : CustomBaseController
     {
@@ -22,8 +23,18 @@ namespace CreditWiseHub.API.Controllers
         [Authorize(Roles = "User, CashDesk")]
         [AuthorizeByAccountNumber]
         [HttpGet("{accountNumber}")]
-        public async Task<IActionResult> GetAccountInfo(string accountNumber) =>
+        public async Task<IActionResult> GetAccountInfoByAccountNumber(string accountNumber) =>
           ActionResultInstance(await _accountService.GetAccountInfoByAccountNumber(accountNumber));
+
+        [HttpGet("{accountNumber}/isExists")]
+        public async Task<IActionResult> CheckInBankAccount(string accountNumber) =>
+        ActionResultInstance(await _accountService.CheckAccountByAccountNumber(accountNumber));
+
+        [Authorize(Roles = "User, CashDesk")]
+        [AuthorizeByAccountNumber]
+        [HttpGet("{accountNumber}/history")]
+        public async Task<IActionResult> GetAccountHistoryByAccountNumber(string accountNumber) =>
+            ActionResultInstance(await _accountService.GetAccountHistoryByAccountNumber(accountNumber));
 
         [Authorize(Roles = "User, CashDesk")]
         [AuthorizeByAccountNumber]
@@ -49,14 +60,10 @@ namespace CreditWiseHub.API.Controllers
         public async Task<IActionResult> ExternalTransfer(string accountNumber, MoneyExternalTransferDto dto) =>
             ActionResultInstance(await _accountService.ExternalTransfer(accountNumber, dto));
 
-        [HttpGet("{accountNumber}/isExists")]
-        public async Task<IActionResult> CheckInBankAccount(string accountNumber) =>
-            ActionResultInstance(await _accountService.CheckAccountByAccountNumber(accountNumber));
-
         [Authorize(Roles = "User, CashDesk")]
         [AuthorizeByAccountNumber]
-        [HttpGet("{accountNumber}/history")]
-        public async Task<IActionResult> GetAccountHistoryByAccountNumber(string accountNumber) =>
-            ActionResultInstance(await _accountService.GetAccountHistoryByAccountNumber(accountNumber));
+        [HttpPut("{accountNumber}")]
+        public async Task<IActionResult> UpdateAccountByAccountNumber(string accountNumber, UpdateAccountDto updateAccountDto) =>
+          ActionResultInstance(await _accountService.UpdateAccountAsync(accountNumber, updateAccountDto));
     }
 }

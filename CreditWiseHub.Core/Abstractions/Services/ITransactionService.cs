@@ -11,7 +11,7 @@ namespace CreditWiseHub.Core.Abstractions.Services
         Task<Response<TransactionStatusDto>> CreateExternalTransaction(Account account, MoneyExternalTransferDto transferDto);
         Task<Response<TransactionStatusDto>> CheckTransactionStatus(long transactionId);
 
-        Task<Response<TransactionStatusDto>> AddDepositWithdrawalProcess(Account account, decimal amount, bool isNewOpening = false, TransactionType transactionType = TransactionType.Deposit, bool preApproval = true);
+        Task<Response<TransactionStatusDto>> AddDepositWithdrawalProcess(Account account, decimal amount, string description ="", bool isNewOpening = false, TransactionType transactionType = TransactionType.Deposit, bool preApproval = true);
 
     }
 }

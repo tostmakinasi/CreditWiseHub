@@ -1,0 +1,118 @@
+﻿using CreditWiseHub.Core.Enums;
+using CreditWiseHub.Core.Models;
+using CreditWiseHub.Repository.Contexts;
+using CreditWiseHub.Service.Helpers;
+using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CreditWiseHub.Service.Seeds
+{
+    public class SeedService
+    {
+        private readonly UserManager<UserApp> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly AppDbContext _appDbContext;
+        private readonly AccountHelper _accountHelper;
+        public SeedService(UserManager<UserApp> userManager, RoleManager<IdentityRole> roleManager, AppDbContext appDbContext, AccountHelper accountHelper)
+        {
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _appDbContext = appDbContext;
+            _accountHelper = accountHelper;
+        }
+
+        public async Task SeedAsync()
+        {
+            var isExistsRole = await _roleManager.RoleExistsAsync(RoleNames.User.ToString());
+            if (!isExistsRole)
+            {
+                foreach (var role in Enum.GetNames(typeof(RoleNames)))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole { Name = role.ToString() });
+                }
+            }
+
+            var accountTpes = new List<AccountType>{
+                new AccountType
+            {
+                Id = 1,
+                MinimumOpeningBalance = 0,
+                CreatedDate = DateTime.UtcNow,
+                Name = "Vadesiz Hesap",
+                Description = "Kullanıcı ilk kayıt olurken açılan hesap türü"
+            },
+                new AccountType
+                {
+                    Id = 2,
+                    Name = "Vadeli Hesap",
+                    MinimumOpeningBalance = 500,
+                    Description = "Vadeli mevduat hesabı",
+                    CreatedDate = DateTime.UtcNow,
+                },
+                new AccountType
+                {
+                    Id = 3,
+                    Name = "Arı Hesap",
+                    MinimumOpeningBalance = 100,
+                    Description = "Günlük vadeli mevduat hesabı",
+                    CreatedDate = DateTime.UtcNow,
+                }};
+
+            _appDbContext.AccountTypes.AddRange(accountTpes);
+            _appDbContext.SaveChanges();
+
+            var seedUsers = SeedData.GenerateSeedUsers();
+            
+            foreach (var user in seedUsers)
+            {
+                var existingUser = await _userManager.FindByNameAsync(user.UserName);
+
+                if (existingUser == null)
+                {
+                    var result = await _userManager.CreateAsync(user, "Password123"); // Provide a default password
+
+                    if (result.Succeeded)
+                    {
+                        // Assign roles if needed
+                        await _userManager.AddToRoleAsync(user, GetRoleNameFromUserName(user.UserName));
+
+                        //add transaction limits
+                        await _appDbContext.UserTransactionLimits.AddAsync(SeedData.CreateLimitData(user.Id));
+                        await _appDbContext.SaveChangesAsync();
+
+                        //add default account
+                        await _appDbContext.Accounts.AddAsync(SeedData.CreateDefaultAccount(user.Id, await _accountHelper.GenerateAccountNumberAsync()));
+                        await _appDbContext.SaveChangesAsync();
+                    }
+                }
+            }
+        }
+
+        private string GetRoleNameFromUserName(string userName)
+        {
+
+            if (userName.Contains("Admin"))
+            {
+                return RoleNames.Admin.ToString();
+            }
+            else if (userName.Contains("Auditor"))
+            {
+                return RoleNames.Auditor.ToString();
+            }
+            else if (userName.Contains("CashDesk"))
+            {
+                return RoleNames.CashDesk.ToString();
+            }
+            else if (userName.Contains("CustomerService"))
+            {
+                return RoleNames.CustomerService.ToString();
+            }
+
+            return RoleNames.User.ToString(); 
+        }
+    }
+}

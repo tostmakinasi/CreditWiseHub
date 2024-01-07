@@ -13,6 +13,9 @@ namespace CreditWiseHub.Repository.Extensions
             services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<ILoanApplicationRepository, LoanApplicationRepository>();
+            services.AddScoped<IAutomaticPaymentsRegistrationRepository, AutomaticPaymentsRegistrationRepository>();
+            services.AddScoped<ITicketRepository, TicketRepository>();
 
             return services;
         }

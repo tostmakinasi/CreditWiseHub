@@ -8,7 +8,7 @@ namespace CreditWiseHub.Core.Dtos.LoanType
 {
     public class UpdateLoanTypeDto
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public int? MaxInstallmentOption { get; set; }
         public int? MinInstallmentOption { get; set; }
         public decimal? MinLoanAmount { get; set; }

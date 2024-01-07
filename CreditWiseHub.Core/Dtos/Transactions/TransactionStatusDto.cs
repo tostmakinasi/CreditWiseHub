@@ -4,6 +4,7 @@
     {
         public long TransactionId { get; set; }
         public string TransactionStatus { get; set; }
+        public DateTime TransactionDate { get; set; }
         public TransactionStatusDto()
         {
 
