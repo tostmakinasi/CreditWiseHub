@@ -3,6 +3,7 @@ using CreditWiseHub.Core.Models;
 using CreditWiseHub.Repository.Contexts;
 using CreditWiseHub.Service.Helpers;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,9 +62,51 @@ namespace CreditWiseHub.Service.Seeds
                     Description = "Günlük vadeli mevduat hesabı",
                     CreatedDate = DateTime.UtcNow,
                 }};
+            accountTpes.ForEach( x =>
+            {
+                var existingaccountType = _appDbContext.AccountTypes.Where(y => y.Id == x.Id).FirstOrDefault();
 
-            _appDbContext.AccountTypes.AddRange(accountTpes);
-            _appDbContext.SaveChanges();
+                if (existingaccountType is null)
+                {
+                     _appDbContext.AccountTypes.AddAsync(x);
+                     _appDbContext.SaveChangesAsync();
+                }
+            });
+
+            var loantypes = new List<LoanType>()
+           {
+               new LoanType
+                {
+                    Id=1,
+                    Name = "İhtiyaç Kredisi",
+                    InterestRate = 4,
+                    MaxCreditScore = 500,
+                    MinCreditScore = 100,
+                    MaxInstallmentOption = 12,
+                    MinInstallmentOption = 4,
+                },
+                new LoanType
+                {
+                    Id=2,
+                    Name = "Ev Kredisi",
+                    InterestRate = 10,
+                    MaxCreditScore = 1000,
+                    MinCreditScore = 600,
+                    MaxInstallmentOption = 36,
+                    MinInstallmentOption = 4,
+                }
+           };
+
+            loantypes.ForEach( x =>
+            {
+                var existingaccountType = _appDbContext.LoanTypes.Where(y => y.Id == x.Id).FirstOrDefault();
+
+                if (existingaccountType is null)
+                {
+                     _appDbContext.LoanTypes.Add(x);
+                    _appDbContext.SaveChanges();
+                }
+            });
 
             var seedUsers = SeedData.GenerateSeedUsers();
             
