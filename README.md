@@ -46,7 +46,7 @@ Bu proje, .net 7 ve docker-compose kullanarak çalıştırılabilir. Aşağıdak
         docker-compose up
     ```
 
-5. Tarayıcınızda `http://localhost:5000` adresine giderek projeyi kullanın.
+5. Tarayıcınızda `https://localhost:5000` adresine giderek projeyi kullanın.
 
 Not: Bu proje, Windows, Linux veya Mac işletim sistemlerinde çalışabilir. Ancak, docker ve docker-compose'in kurulu ve çalışır durumda olması gerekir. Bu araçları nasıl kuracağınızı öğrenmek için, docker belgelerine veya docker-compose belgelerine bakabilirsiniz.
 
