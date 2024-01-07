@@ -25,13 +25,29 @@ Students will gain in-depth knowledge and experience in modern web technologies 
  - Hangfire
 
 
-  ## Yükleme 
+## Yükleme
 
-benim-projem'i npm kullanarak yükleyin
+Bu proje, .net 7 ve docker-compose kullanarak çalıştırılabilir. Aşağıdaki adımları izleyerek projeyi yükleyebilirsiniz:
 
-```bash 
-  npm install my-project
-  cd my-project
-```
-    ## Objective:
-The primary objective of this assignment is to provide students with practical experience in designing and developing RESTful APIs using .NET. While developing an API that encompasses both basic and advanced banking functions, students will acquire significant skills in areas such as security, database management, data validation, and service-oriented architecture.
+1. Projeyi GitHub'dan klonlayın veya indirin.
+   ```bash 
+        git clone https://github.com/tostmakinasi/CreditWiseHub.git
+    ```
+2. Proje dizinine komut satırından girin.
+    ```bash 
+        cd CreditWiseHub
+    ```
+
+3. `docker-compose build` komutunu çalıştırarak projeyi docker imajlarına dönüştürün.
+    ```bash
+        docker-compose build
+    ```
+
+4. `docker-compose up` komutunu çalıştırarak projeyi docker containerları olarak başlatın.
+    ```bash
+        docker-compose up
+    ```
+
+5. Tarayıcınızda `http://localhost:5000` adresine giderek projeyi kullanın.
+
+Not: Bu proje, Windows, Linux veya Mac işletim sistemlerinde çalışabilir. Ancak, docker ve docker-compose'in kurulu ve çalışır durumda olması gerekir. Bu araçları nasıl kuracağınızı öğrenmek için, docker belgelerine veya docker-compose belgelerine bakabilirsiniz.
