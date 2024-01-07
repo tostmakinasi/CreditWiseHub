@@ -47,11 +47,11 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 //Seed Db
-using (var scope = app.Services.CreateScope())
-{
-    var seedService = scope.ServiceProvider.GetRequiredService<SeedService>();
-    await seedService.SeedAsync();
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var seedService = scope.ServiceProvider.GetRequiredService<SeedService>();
+//    await seedService.SeedAsync();
+//}
 
 
 // Configure the HTTP request pipeline.
