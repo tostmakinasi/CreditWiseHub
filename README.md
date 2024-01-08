@@ -24,8 +24,36 @@ Development of a Banking RESTful API with .NET
  - Hangfire
 
 ## Install
+--
 
-Bu proje, .net 7 ve docker-compose kullanarak çalıştırılabilir. Aşağıdaki adımları izleyerek projeyi yükleyebilirsiniz:
+This project can be run using .NET 7 and docker-compose. You can install the project by following the steps below:
+
+1. Clone or download the project from GitHub.
+   ```bash 
+        git clone https://github.com/tostmakinasi/CreditWiseHub.git
+    ```
+2. Navigate to the project directory in the command line.
+    ```bash 
+        cd CreditWiseHub
+    ```
+
+3. Convert the project to docker images by running the `docker-compose build` command.
+    ```bash
+        docker-compose build
+    ```
+
+4. Start the project as docker containers by running the `docker-compose up -d` command.
+    ```bash
+        docker-compose up -d
+    ```
+
+5. Use the project by navigating to `https://localhost:5000` n your browser. If it doesn't connect, restart the `creditwise-hub` container in Docker.
+
+Note: This project can run on Windows, Linux, or Mac operating systems. However, Docker and docker-compose need to be installed and operational. You can refer to the Docker documentation or docker-compose documentation to learn how to install these tools.
+
+--
+
+[TR]Bu proje, .net 7 ve docker-compose kullanarak çalıştırılabilir. Aşağıdaki adımları izleyerek projeyi yükleyebilirsiniz:
 
 1. Projeyi GitHub'dan klonlayın veya indirin.
    ```bash 
@@ -41,9 +69,9 @@ Bu proje, .net 7 ve docker-compose kullanarak çalıştırılabilir. Aşağıdak
         docker-compose build
     ```
 
-4. `docker-compose up` komutunu çalıştırarak projeyi docker containerları olarak başlatın.
+4. `docker-compose up -d` komutunu çalıştırarak projeyi docker containerları olarak başlatın.
     ```bash
-        docker-compose up
+        docker-compose up -d
     ```
 
 5. Tarayıcınızda `https://localhost:5000` adresine giderek projeyi kullanın.
