@@ -24,6 +24,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - "./scripts/init.sql:/docker-entrypoint-initdb.d/script.sql"
+      - "./scripts/inithangfire.sql:/docker-entrypoint-initdb.d/scripthangfire.sql"
     restart: unless-stopped
 
   #pgadmin:
