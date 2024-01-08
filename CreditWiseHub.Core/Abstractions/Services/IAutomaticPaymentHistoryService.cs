@@ -1,11 +1,8 @@
-﻿using CreditWiseHub.Core.Dtos.AutomaticPayment;
-using CreditWiseHub.Core.Dtos.Responses;
+﻿using CreditWiseHub.Core.Dtos;
+using CreditWiseHub.Core.Dtos.AutomaticPayment;
 using CreditWiseHub.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CreditWiseHub.Core.Responses;
+
 
 namespace CreditWiseHub.Core.Abstractions.Services
 {

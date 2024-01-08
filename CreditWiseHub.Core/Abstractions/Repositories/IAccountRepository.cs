@@ -14,6 +14,10 @@ namespace CreditWiseHub.Core.Abstractions.Repositories
         /// <returns>The account associated with the provided account number, or null if not found.</returns>
         Task<Account> GetAccountByAccountNumber(string accountNumber);
 
+        Task<Account> GetUserDefaultAccountByAccountNumberWithUserAndUserLimits(string userID);
+
+        Task<Account> GetAccountByAccountNumberWithUserAndUserLimits(string accountNumber);
+
         /// <summary>
         /// Gets the full name of the account holder based on the account number.
         /// </summary>

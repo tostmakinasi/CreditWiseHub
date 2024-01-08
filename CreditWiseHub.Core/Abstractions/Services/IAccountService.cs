@@ -1,8 +1,8 @@
 ﻿using CreditWiseHub.Core.Dtos;
 using CreditWiseHub.Core.Dtos.Account;
 using CreditWiseHub.Core.Dtos.AutomaticPayment;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Dtos.Transactions;
+using CreditWiseHub.Core.Responses;
 
 namespace CreditWiseHub.Core.Abstractions.Services
 {

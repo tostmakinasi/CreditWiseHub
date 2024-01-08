@@ -1,4 +1,4 @@
-﻿using CreditWiseHub.Core.Dtos.Responses;
+﻿using CreditWiseHub.Core.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 

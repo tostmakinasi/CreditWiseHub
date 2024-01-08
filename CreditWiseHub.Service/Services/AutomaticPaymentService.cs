@@ -4,8 +4,8 @@ using CreditWiseHub.Core.Abstractions.Services;
 using CreditWiseHub.Core.Abstractions.UnitOfWorks;
 using CreditWiseHub.Core.Dtos;
 using CreditWiseHub.Core.Dtos.AutomaticPayment;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Models;
+using CreditWiseHub.Core.Responses;
 using CreditWiseHub.Service.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,16 +19,20 @@ namespace CreditWiseHub.Service.Services
 {
     public class AutomaticPaymentService : IAutomaticPaymentService
     {
-        private readonly IGenericRepository<AutomaticPaymentRegistration,long> _registrationRepository;
+        private readonly IAccountService _accountService;
+        private readonly IAutomaticPaymentHistoryService _automaticPaymentHistoryService;
+        private readonly IAutomaticPaymentsRegistrationRepository _registrationRepository;
         private readonly UserManager<UserApp> _userManager; 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public AutomaticPaymentService(IGenericRepository<AutomaticPaymentRegistration, long> registrationRepository, IUnitOfWork unitOfWork, IMapper mapper, UserManager<UserApp> userManager)
+        public AutomaticPaymentService(IAutomaticPaymentsRegistrationRepository registrationRepository, IUnitOfWork unitOfWork, IMapper mapper, UserManager<UserApp> userManager, IAccountService accountService, IAutomaticPaymentHistoryService automaticPaymentHistoryService)
         {
             _registrationRepository = registrationRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
+            _accountService = accountService;
+            _automaticPaymentHistoryService = automaticPaymentHistoryService;
         }
 
         public async Task<Response<NoDataDto>> CancelRegisteredPaymentById(long automaticPaymentId)
@@ -65,7 +69,7 @@ namespace CreditWiseHub.Service.Services
         {
             var userId = await CheckUserAndGetUserId(username);
 
-            var registeredPaymentList = await _registrationRepository.Where(x => x.IsActive).Include(x => x.AutomaticPaymentHistories).ToListAsync();
+            var registeredPaymentList = await _registrationRepository.GetPaymentsWithHistoriesByUserId(userId);
 
             if(!registeredPaymentList.Any())
                 return Response< List<AutomaticPaymentDetailDto>>.Fail("Registered Automatic Payments not found", System.Net.HttpStatusCode.NotFound, true);
@@ -75,11 +79,32 @@ namespace CreditWiseHub.Service.Services
             return Response<List<AutomaticPaymentDetailDto>>.Success(paymentDtoList, System.Net.HttpStatusCode.OK);
         }
 
+        public async Task HandlePaymentProcess()
+        {
+            var payments = await _registrationRepository.GetPaymentsDueToday(GetLastInMonthDays());
+
+            foreach (var payment in payments)
+            {
+                payment.PaymentDuePaidCount += 1;
+                await _unitOfWork.CommitAsync();
+
+                var dto = _mapper.Map<PaymentProcessDto>(payment);
+
+                var accountResult = await _accountService.WithdrawMoneyForAutomaticPayment(dto);
+
+                await _automaticPaymentHistoryService.AddPaymentHistory(payment, accountResult);
+
+                if (payment.PaymentDueCount == payment.PaymentDuePaidCount)
+                {
+                    payment.IsActive = false;
+                    await _unitOfWork.CommitAsync();
+                }
+            }
+        }
+
+
         public async Task<Response<AutomaticPaymentDetailDto>> RegistrationInvoiceAutomaticPayment(string username, CreateInvoiceAutomaticPaymentDto paymentDto)
         {
-            var user = await _userManager.FindByNameAsync(username);
-            if (user is null)
-                return Response<AutomaticPaymentDetailDto>.Fail("User not found", System.Net.HttpStatusCode.NotFound, true);
 
             var registration = _mapper.Map<AutomaticPaymentRegistration>(paymentDto);
             registration.UserId = await CheckUserAndGetUserId(username);
@@ -110,6 +135,22 @@ namespace CreditWiseHub.Service.Services
             return user.Id;
         }
 
-   
+        private List<int> GetLastInMonthDays()
+        {
+            var date = DateTime.UtcNow;
+            var lastDayInMonth = DateTime.DaysInMonth(date.Year, date.Month);
+
+            if (date.Day <= lastDayInMonth)
+                return new List<int> { date.Day };
+
+            List<int> days = new List<int>();
+
+            for (int i = 31; i <= date.Day; i--)
+            {
+                days.Add(i);
+            }
+
+            return days;
+        }
     }
 }

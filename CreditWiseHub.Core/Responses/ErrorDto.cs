@@ -1,4 +1,7 @@
-﻿namespace CreditWiseHub.Core.Dtos.Responses
+﻿using Microsoft.AspNetCore.Identity;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace CreditWiseHub.Core.Responses
 {
     public class ErrorDto
     {
@@ -23,6 +26,12 @@
         public ErrorDto(List<string> errors, bool isShow)
         {
             Errors = errors;
+            IsShow = isShow;
+        }
+
+        public ErrorDto(IEnumerable<IdentityError> ıdentityErrors, bool isShow)
+        {
+            Errors = ıdentityErrors.Select(x => x.Description).ToList();
             IsShow = isShow;
         }
     }

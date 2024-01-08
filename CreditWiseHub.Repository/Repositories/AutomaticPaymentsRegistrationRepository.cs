@@ -23,6 +23,11 @@ namespace CreditWiseHub.Repository.Repositories
             return payments;
         }
 
-        
+        public async Task<List<AutomaticPaymentRegistration>> GetPaymentsWithHistoriesByUserId(string userId)
+        {
+            var payments = await _dbSet.Where(x=> x.UserId == userId).Include(x => x.AutomaticPaymentHistories).ToListAsync();
+
+            return payments;
+        }
     }
 }

@@ -1,7 +1,7 @@
-﻿using CreditWiseHub.Core.Dtos.Responses;
-using CreditWiseHub.Core.Dtos.Transactions;
+﻿using CreditWiseHub.Core.Dtos.Transactions;
 using CreditWiseHub.Core.Enums;
 using CreditWiseHub.Core.Models;
+using CreditWiseHub.Core.Responses;
 
 namespace CreditWiseHub.Core.Abstractions.Services
 {

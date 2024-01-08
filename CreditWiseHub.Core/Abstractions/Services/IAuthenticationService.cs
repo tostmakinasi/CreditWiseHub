@@ -1,7 +1,7 @@
 ﻿using CreditWiseHub.Core.Dtos;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Dtos.Token;
 using CreditWiseHub.Core.Dtos.User;
+using CreditWiseHub.Core.Responses;
 
 namespace CreditWiseHub.Core.Abstractions.Services
 {

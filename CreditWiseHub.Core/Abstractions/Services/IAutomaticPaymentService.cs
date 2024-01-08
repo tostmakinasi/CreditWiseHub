@@ -1,6 +1,6 @@
 ﻿using CreditWiseHub.Core.Dtos;
 using CreditWiseHub.Core.Dtos.AutomaticPayment;
-using CreditWiseHub.Core.Dtos.Responses;
+using CreditWiseHub.Core.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +16,7 @@ namespace CreditWiseHub.Core.Abstractions.Services
         Task<Response<List<AutomaticPaymentDetailDto>>> GetRegisteredPaymentsByUserName(string username);
         Task<Response<AutomaticPaymentDetailDto>> GetRegisteredPaymentById(long automaticPaymentId);
         Task<Response<NoDataDto>> CancelRegisteredPaymentById(long automaticPaymentId);
+        Task HandlePaymentProcess();
+
     }
 }

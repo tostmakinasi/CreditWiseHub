@@ -1,11 +1,11 @@
 ﻿using CreditWiseHub.Core.Dtos.LoanType;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CreditWiseHub.Core.Responses;
 
 namespace CreditWiseHub.Core.Abstractions.Services
 {

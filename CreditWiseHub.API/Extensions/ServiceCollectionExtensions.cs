@@ -1,6 +1,6 @@
 ﻿using CreditWiseHub.Core.Configurations;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Models;
+using CreditWiseHub.Core.Responses;
 using CreditWiseHub.Repository.Contexts;
 using CreditWiseHub.Repository.Extensions;
 using CreditWiseHub.Service.Extensions;

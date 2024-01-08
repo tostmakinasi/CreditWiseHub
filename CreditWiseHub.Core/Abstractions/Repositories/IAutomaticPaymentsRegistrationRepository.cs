@@ -10,5 +10,6 @@ namespace CreditWiseHub.Core.Abstractions.Repositories
     public interface IAutomaticPaymentsRegistrationRepository : IGenericRepository<AutomaticPaymentRegistration,long>
     {
         Task<List<AutomaticPaymentRegistration>> GetPaymentsDueToday(List<int> days);
+        Task<List<AutomaticPaymentRegistration>> GetPaymentsWithHistoriesByUserId(string userId);
     }
 }

@@ -1,5 +1,5 @@
 ﻿using CreditWiseHub.Core.Dtos;
-using CreditWiseHub.Core.Dtos.Responses;
+using CreditWiseHub.Core.Responses;
 using CreditWiseHub.Service.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Net;

@@ -5,10 +5,10 @@ using CreditWiseHub.Core.Abstractions.UnitOfWorks;
 using CreditWiseHub.Core.Dtos;
 using CreditWiseHub.Core.Dtos.Account;
 using CreditWiseHub.Core.Dtos.AutomaticPayment;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Dtos.Transactions;
 using CreditWiseHub.Core.Enums;
 using CreditWiseHub.Core.Models;
+using CreditWiseHub.Core.Responses;
 using CreditWiseHub.Service.Exceptions;
 using CreditWiseHub.Service.Helpers;
 using Microsoft.AspNetCore.Identity;
@@ -24,12 +24,10 @@ namespace CreditWiseHub.Service.Services
         private readonly IGenericRepository<AccountType, int> _accountTypeRepository;
         private readonly ITransactionService _transactionService;
         private readonly UserManager<UserApp> _userManager;
-        private readonly IGenericRepository<UserTransactionLimit, string> _userTransactionLimitRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly AccountHelper _helper; 
 
-        public AccountService(IAccountRepository accountRepository, IMapper mapper, IUnitOfWork unitOfWork, UserManager<UserApp> userManager, IGenericRepository<AccountType, int> accountTypeRepository, ITransactionService transactionService, IGenericRepository<UserTransactionLimit, string> userTransactionLimitRepository, AccountHelper helper)
+        public AccountService(IAccountRepository accountRepository, IMapper mapper, IUnitOfWork unitOfWork, UserManager<UserApp> userManager, IGenericRepository<AccountType, int> accountTypeRepository, ITransactionService transactionService)
         {
             _accountRepository = accountRepository;
             _mapper = mapper;
@@ -37,8 +35,6 @@ namespace CreditWiseHub.Service.Services
             _userManager = userManager;
             _accountTypeRepository = accountTypeRepository;
             _transactionService = transactionService;
-            _userTransactionLimitRepository = userTransactionLimitRepository;
-            _helper = helper;
         }
 
         public async Task<Response<AccountInfoDto>> CreateByUserName(string userName, CreateAccountDto createAccountDto)
@@ -53,10 +49,8 @@ namespace CreditWiseHub.Service.Services
             if (accountType is null)
                 return Response<AccountInfoDto>.Fail("Account Type not found", HttpStatusCode.NotFound, true);
 
-            if (!_helper.CheckOpeningBalance(createAccountDto.OpeningBalance, accountType.MinimumOpeningBalance))
-                return Response<AccountInfoDto>.Fail("Account opening amount does not meet the minimum account opening amount.", HttpStatusCode.BadRequest, true);
-
-
+            if (createAccountDto.OpeningBalance < accountType.MinimumOpeningBalance)
+                return Response<AccountInfoDto>.Fail("Account opening amount must greater or equal to minimum account opening amount.", HttpStatusCode.BadRequest, true);
 
             if(createAccountDto.AccountTypeId == 1 && await _accountRepository.Where(x => x.AccountTypeId == 1 && x.IsActive && x.UserAppId == user.Id).AnyAsync())
                 return Response<AccountInfoDto>.Fail("You already have a default account", HttpStatusCode.NotAcceptable, true);
@@ -65,7 +59,7 @@ namespace CreditWiseHub.Service.Services
 
             account.UserAppId = user.Id;
             account.UserApp = user;
-            account.AccountNumber = await _helper.GenerateAccountNumberAsync();
+            account.AccountNumber = await GenerateAccountNumberAsync();
             account.AccountTypeId = accountType.Id;
             account.AccountType = accountType;
             account.CreatedDate = DateTime.UtcNow;
@@ -89,33 +83,21 @@ namespace CreditWiseHub.Service.Services
 
         public async Task<Response<RecipientAccountInfoDto>> CheckAccountByAccountNumber(string accountNumber)
         {
-            var account = await _helper.GetValidAccountByAccountNumber(accountNumber);
+            var account = await GetValidAccountByAccountNumber(accountNumber);
 
-            var user = await _userManager.FindByIdAsync(account.UserAppId);
-
-            if (user is null)
-                return Response<RecipientAccountInfoDto>.Fail("User not found", HttpStatusCode.InternalServerError, false);
-
-            RecipientAccountInfoDto info = new()
-            {
-                AccountId = account.Id.ToString(),
-                OwnerFullName = _helper.GenerateUserNameWithCensor($"{user.Name} {user.Surname}")
-            };
+            var info = _mapper.Map<RecipientAccountInfoDto>(account);
 
             return Response<RecipientAccountInfoDto>.Success(info, HttpStatusCode.OK);
         }
 
         public async Task<Response<AccountLastInfoDto>> DepositMoneyByAccountNumber(string accountNumber, MoneyProcessAmountDto createDepositDto)
         {
-            var account = await _helper.GetValidAccountByAccountNumber(accountNumber);
+            var account = await GetValidAccountByAccountNumber(accountNumber);
 
             await _unitOfWork.BeginTransactionAsync();
 
-            await _transactionService.AddDepositWithdrawalProcess(account, createDepositDto.Amount);
-
-            account.Balance += createDepositDto.Amount;
-            account.UpdatedDate = DateTime.UtcNow;
-            await _unitOfWork.CommitAsync();
+                await _transactionService.AddDepositWithdrawalProcess(account, createDepositDto.Amount);
+                await BalanceTransactionAsync(account, account.Balance,BalanceTransactionType.Increase);
 
             await _unitOfWork.TransactionCommitAsync();
 
@@ -126,26 +108,18 @@ namespace CreditWiseHub.Service.Services
 
         public async Task<Response<AccountLastInfoDto>> WithdrawMoneyByAccountNumber(string accountNumber, MoneyProcessAmountDto amountDto, string description = "")
         {
-            var account = await _helper.GetValidAccountByAccountNumber(accountNumber);
+            var account = await GetValidAccountWithUserAndUserLimitsByAccountNumber(accountNumber);
 
-            var userLimitation = await _userTransactionLimitRepository.GetByIdAsync(account.UserAppId);
-
-            var checkLimits = await _helper.CheckUserLimitationFotWithdraw(amountDto.Amount, account, userLimitation);
+            var checkLimits = await CheckUserLimitationFotWithdraw(amountDto.Amount, account, account.UserApp.UserTransactionLimit);
 
             if (!checkLimits.result)
                 return Response<AccountLastInfoDto>.Fail(checkLimits.error, HttpStatusCode.NotAcceptable, false);
 
             await _unitOfWork.BeginTransactionAsync();
-            await _transactionService.AddDepositWithdrawalProcess(account, amountDto.Amount, description, false,TransactionType.Withdraw, true);
+                await _transactionService.AddDepositWithdrawalProcess(account, amountDto.Amount, description, false,TransactionType.Withdraw, true);
 
-            account.Balance -= amountDto.Amount;
-            account.UpdatedDate = DateTime.UtcNow;
-            await _unitOfWork.CommitAsync();
-
-            userLimitation.DailyTransactionAmount += amountDto.Amount;
-
-            await _unitOfWork.CommitAsync();
-
+                await BalanceTransactionAsync(account, amountDto.Amount, BalanceTransactionType.Decrease);
+                await UpdateUserTransactionLimitsAsync(account.UserApp.UserTransactionLimit, amountDto.Amount);
             await _unitOfWork.TransactionCommitAsync();
 
             var lasInfoDto = _mapper.Map<AccountLastInfoDto>(account);
@@ -155,66 +129,53 @@ namespace CreditWiseHub.Service.Services
 
         public async Task<Response<PaymentProcessResultDto>> WithdrawMoneyForAutomaticPayment(PaymentProcessDto dto)
         {
-            var account = await _accountRepository.Where(x => x.UserAppId == dto.UserId && x.AccountTypeId == 1).FirstOrDefaultAsync();
+            var account = await _accountRepository.GetUserDefaultAccountByAccountNumberWithUserAndUserLimits(dto.UserId);
 
             if (account is null)
                 return Response<PaymentProcessResultDto>.Fail("Account not found", HttpStatusCode.NotFound, true);
 
-            var userLimitation = await _userTransactionLimitRepository.GetByIdAsync(dto.UserId);
-
-            var checkLimits = await _helper.CheckUserLimitationFotWithdraw(dto.PaymentAmount, account, userLimitation);
+            var checkLimits = await CheckUserLimitationFotWithdraw(dto.PaymentAmount, account, account.UserApp.UserTransactionLimit);
 
             if (!checkLimits.result)
                 return Response<PaymentProcessResultDto>.Fail(checkLimits.error, HttpStatusCode.NotAcceptable, false);
 
             await _unitOfWork.BeginTransactionAsync();
-            var transactionResult = await _transactionService.AddDepositWithdrawalProcess(account, dto.PaymentAmount, dto.Description, false, TransactionType.Withdraw, true);
+                var transactionResult = await _transactionService.AddDepositWithdrawalProcess(account, dto.PaymentAmount, dto.Description, false, TransactionType.Withdraw, true);
 
-            account.Balance -= dto.PaymentAmount;
-            account.UpdatedDate = DateTime.UtcNow;
-            await _unitOfWork.CommitAsync();
+                await BalanceTransactionAsync(account,dto.PaymentAmount, BalanceTransactionType.Decrease);
+                await UpdateUserTransactionLimitsAsync(account.UserApp.UserTransactionLimit, dto.PaymentAmount);
 
             await _unitOfWork.TransactionCommitAsync();
 
-            PaymentProcessResultDto result = new()
-            {
-                PaymentDate = transactionResult.Data.TransactionDate,
-                TransactionId = transactionResult.Data.TransactionId,
-
-            };
+            var result = _mapper.Map<PaymentProcessResultDto>(transactionResult.Data);
 
             return Response<PaymentProcessResultDto>.Success(result, HttpStatusCode.OK);
         }
 
         public async Task<Response<TransactionStatusDto>> InternalMoneyTransfer(string accountNumber, MoneyTransferDto transferDto)
         {
-            var senderAccount = await _helper.GetValidAccountByAccountNumber(accountNumber);
+            var senderAccount = await GetValidAccountWithUserAndUserLimitsByAccountNumber(accountNumber);
 
-            var receiverAccount = await _helper.GetValidAccountByAccountNumber(transferDto.AccountInformation.AccountNumber);
+            var receiverAccount = await GetValidAccountByAccountNumber(transferDto.AccountInformation.AccountNumber);
 
-            if($"{receiverAccount.UserApp.Name} {receiverAccount.UserApp.Surname}".ToLower() != transferDto.AccountInformation.AccountHolderFullName.ToLower().Trim())
+            var userNameValidation = $"{receiverAccount.UserApp.Name} {receiverAccount.UserApp.Surname}".ToLower() == transferDto.AccountInformation.AccountHolderFullName.ToLower().Trim();
+
+            if (!userNameValidation)
                 return Response<TransactionStatusDto>.Fail("Account Holder Name doesn't match", HttpStatusCode.BadRequest, false);
 
-            var userLimitation = await _userTransactionLimitRepository.GetByIdAsync(senderAccount.UserAppId);
-
-            var checkLimitation = await _helper.CheckUserLimitationFotWithdraw(transferDto.Amount, senderAccount, userLimitation);
+            var checkLimitation = await CheckUserLimitationFotWithdraw(transferDto.Amount, senderAccount, senderAccount.UserApp.UserTransactionLimit);
 
             if (!checkLimitation.result)
                 return Response<TransactionStatusDto>.Fail(checkLimitation.error, HttpStatusCode.NotAcceptable, false);
 
             await _unitOfWork.BeginTransactionAsync();
 
-            var transactionResponse = await _transactionService.CreateInternalTransaction(receiverAccount, senderAccount, transferDto);
+                var transactionResponse = await _transactionService.CreateInternalTransaction(receiverAccount, senderAccount, transferDto);
 
-            senderAccount.Balance -= transferDto.Amount;
-            receiverAccount.Balance += transferDto.Amount;
-            senderAccount.UpdatedDate = DateTime.UtcNow;
-            receiverAccount.UpdatedDate = DateTime.UtcNow;
-
-            userLimitation.DailyTransactionAmount += transferDto.Amount;
-
-            await _unitOfWork.CommitAsync();
-
+                await BalanceTransactionAsync(senderAccount, transferDto.Amount, BalanceTransactionType.Decrease);
+                await UpdateUserTransactionLimitsAsync(senderAccount.UserApp.UserTransactionLimit, transferDto.Amount);
+                await BalanceTransactionAsync(receiverAccount, transferDto.Amount, BalanceTransactionType.Increase);
+ 
             await _unitOfWork.TransactionCommitAsync();
 
             return Response<TransactionStatusDto>.Success(transactionResponse.Data, HttpStatusCode.Accepted);
@@ -222,54 +183,28 @@ namespace CreditWiseHub.Service.Services
 
         public async Task<Response<TransactionStatusDto>> ExternalTransfer(string accountNumber, MoneyExternalTransferDto transferDto)
         {
-            var account = await _helper.GetValidAccountByAccountNumber(accountNumber);
+            var account = await GetValidAccountWithUserAndUserLimitsByAccountNumber(accountNumber);
 
+            var balanceTransactionType = transferDto.TransferType == MoneyTransferType.Outgoing ? BalanceTransactionType.Decrease : BalanceTransactionType.Increase;
+            await _unitOfWork.BeginTransactionAsync();
+            
             if (transferDto.TransferType == MoneyTransferType.Outgoing)
-                return await ExternalOutGoingTransfer(account, transferDto);
+            {
+                var checkLimitation = await CheckUserLimitationFotWithdraw(transferDto.Amount, account, account.UserApp.UserTransactionLimit);
 
-            return await ExternalInComingTransfer(account, transferDto);
-        }
+                if (!checkLimitation.result)
+                    return Response<TransactionStatusDto>.Fail(checkLimitation.error, HttpStatusCode.NotAcceptable, false);
 
-        private async Task<Response<TransactionStatusDto>> ExternalOutGoingTransfer(Account account, MoneyExternalTransferDto transferDto)
-        {
-            var userLimitation = await _userTransactionLimitRepository.GetByIdAsync(account.UserAppId);
-            var checkLimitation = await _helper.CheckUserLimitationFotWithdraw(transferDto.Amount, account, userLimitation);
-
-            if (!checkLimitation.result)
-                return Response<TransactionStatusDto>.Fail(checkLimitation.error, HttpStatusCode.NotAcceptable, false);
-
-            await _unitOfWork.BeginTransactionAsync();
-
+                await UpdateUserTransactionLimitsAsync(account.UserApp.UserTransactionLimit, transferDto.Amount);
+            }
+            await BalanceTransactionAsync(account, transferDto.Amount, balanceTransactionType);
             await SaveExternalAccount(transferDto.AccountInformation);
 
             var transactionResponse = await _transactionService.CreateExternalTransaction(account, transferDto);
-
-            account.Balance -= transferDto.Amount;
-            account.UpdatedDate = DateTime.UtcNow;
-            userLimitation.DailyTransactionAmount += transferDto.Amount;
-
-            await _unitOfWork.CommitAsync();
-
             await _unitOfWork.TransactionCommitAsync();
 
             return Response<TransactionStatusDto>.Success(transactionResponse.Data, HttpStatusCode.Accepted);
-        }
 
-        private async Task<Response<TransactionStatusDto>> ExternalInComingTransfer(Account account, MoneyExternalTransferDto transferDto)
-        {
-            await _unitOfWork.BeginTransactionAsync();
-
-            await SaveExternalAccount(transferDto.AccountInformation);
-
-            var transactionResponse = await _transactionService.CreateExternalTransaction(account, transferDto);
-
-            account.Balance += transferDto.Amount;
-            account.UpdatedDate = DateTime.UtcNow;
-            await _unitOfWork.CommitAsync();
-
-            await _unitOfWork.TransactionCommitAsync();
-
-            return Response<TransactionStatusDto>.Success(transactionResponse.Data, HttpStatusCode.Accepted);
         }
 
         private async Task SaveExternalAccount(AffectedExternalAccountDto accountDto)
@@ -282,7 +217,7 @@ namespace CreditWiseHub.Service.Services
 
         public async Task<Response<AccountInfoDto>> GetAccountInfoByAccountNumber(string accountNumber)
         {
-            var account = await _helper.GetValidAccountByAccountNumber(accountNumber);
+            var account = await GetValidAccountByAccountNumber(accountNumber);
 
             var accountInfoDto = _mapper.Map<AccountInfoDto>(account);
 
@@ -310,7 +245,7 @@ namespace CreditWiseHub.Service.Services
 
         public async Task<Response<NoDataDto>> UpdateAccountAsync(string accountNumber, UpdateAccountDto updateAccountDto)
         {
-            var account = await _helper.GetValidAccountByAccountNumber(accountNumber);
+            var account = await GetValidAccountByAccountNumber(accountNumber);
 
             account.Name = updateAccountDto.Name is not null ? updateAccountDto.Name : account.Name;
             account.Description = updateAccountDto.Description is not null ? updateAccountDto.Description : account.Description;
@@ -332,23 +267,21 @@ namespace CreditWiseHub.Service.Services
 
         public async Task<Response<TransactionStatusDto>> TransferCreditToAccountByUserId(string userId, decimal creditAmount)
         {
-            var userDefaultAccount = await _accountRepository.Where(x => x.AccountTypeId == 1 && x.UserAppId == userId).FirstOrDefaultAsync();
-            //await _unitOfWork.BeginTransactionAsync();
+            var userDefaultAccount = await _accountRepository.GetUserDefaultAccountByAccountNumberWithUserAndUserLimits(userId);
+            await _unitOfWork.BeginTransactionAsync();
 
             var transactionStatusResponse = await _transactionService.AddDepositWithdrawalProcess(userDefaultAccount, creditAmount, "Onaylanan Kredi Tutarı Hesaba Aktarımı");
 
-            userDefaultAccount.Balance += creditAmount;
-            userDefaultAccount.UpdatedDate = DateTime.UtcNow;
-            await _unitOfWork.CommitAsync();
+            await BalanceTransactionAsync(userDefaultAccount, creditAmount, BalanceTransactionType.Increase);
 
-            //await _unitOfWork.TransactionCommitAsync();
+            await _unitOfWork.TransactionCommitAsync();
 
             return Response<TransactionStatusDto>.Success(transactionStatusResponse.Data, HttpStatusCode.Accepted);
         }
 
         public async Task<Response<NoDataDto>> CloseAccount(string accountNumber)
         {
-            var account = await _helper.GetValidAccountByAccountNumber(accountNumber);
+            var account = await GetValidAccountByAccountNumber(accountNumber);
 
             if (account.Balance > 0)
                 return Response<NoDataDto>.Fail("Account Balance must be 0", HttpStatusCode.NotAcceptable, true);
@@ -356,6 +289,7 @@ namespace CreditWiseHub.Service.Services
                 return Response<NoDataDto>.Fail("Default account cannot be closed", HttpStatusCode.NotAcceptable, true);
 
             account.IsActive = false;
+            await _unitOfWork.CommitAsync();
             return Response<NoDataDto>.Success(HttpStatusCode.NoContent);
         }
 
@@ -364,9 +298,85 @@ namespace CreditWiseHub.Service.Services
             var account = await _accountRepository.GetAccountByAccountNumber(accountNumber);
 
             if (account is null)
-                throw new BadRequestException("Account not foud");
+                throw new BadRequestException("Account not found");
 
             return account.UserAppId == userId;
+        }
+
+
+        private async Task BalanceTransactionAsync(Account account, decimal amount, BalanceTransactionType transactionType)
+        {
+
+            account.Balance = transactionType == BalanceTransactionType.Increase?account.Balance + amount : account.Balance - amount;
+            account.UpdatedDate = DateTime.UtcNow;
+            await _unitOfWork.CommitAsync();
+
+        }
+
+        private async Task UpdateUserTransactionLimitsAsync(UserTransactionLimit userLimit, decimal amount)
+        {
+            userLimit.DailyTransactionAmount += amount;
+            await _unitOfWork.CommitAsync();
+        }
+
+        private async Task<(bool result, string error)> CheckUserLimitationFotWithdraw(decimal amount, Account account, UserTransactionLimit userLimitation)
+        {
+            if (account.Balance < amount)
+                return (false, $"Account({account.AccountNumber}) balance is insufficient");
+
+            if (userLimitation.LastProcessDate.Date < DateTime.UtcNow.Date)
+            {
+                userLimitation.LastProcessDate = DateTime.UtcNow.Date;
+                userLimitation.DailyTransactionAmount = 0;
+
+                await _unitOfWork.CommitAsync();
+            }
+
+            if (amount > userLimitation.InstantTransactionLimit)
+                return (false, $"Account instant transaction limit is insufficient");
+
+            if (amount + userLimitation.DailyTransactionAmount > userLimitation.DailyTransactionLimit)
+                return (false, $"Account monthly transaction limit is insufficient");
+
+            return (true, "");
+        }
+
+        private async Task<Account> GetValidAccountByAccountNumber(string accountNumber)
+        {
+            var account = await _accountRepository.GetAccountByAccountNumber(accountNumber);
+            if (account is null)
+                throw new NotFoundException($"Account ({accountNumber}) not found");
+            return account;
+        }
+
+        private async Task<Account> GetValidAccountWithUserAndUserLimitsByAccountNumber(string accountNumber)
+        {
+            var account = await _accountRepository.GetAccountByAccountNumberWithUserAndUserLimits(accountNumber);
+            if (account is null)
+                throw new NotFoundException($"Account ({accountNumber}) not found");
+            return account;
+        }
+
+        private async Task<string> GenerateAccountNumberAsync()
+        {
+            string accountNumber = "";
+            var accountNumberCheck = true;
+            do
+            {
+                accountNumber = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper();
+                accountNumberCheck = await _accountRepository.AnyAsync(x => x.AccountNumber == accountNumber);
+
+            } while (accountNumberCheck);
+
+            return accountNumber;
+        }
+
+        private bool CheckOpeningBalance(decimal openingBalance, decimal minimumOpeningBalance)
+        {
+            if (openingBalance >= minimumOpeningBalance)
+                return true;
+
+            return false;
         }
 
     }

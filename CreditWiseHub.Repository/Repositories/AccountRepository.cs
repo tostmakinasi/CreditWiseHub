@@ -24,7 +24,14 @@ namespace CreditWiseHub.Repository.Repositories
             return account;
         }
 
-
+        public async Task<Account> GetAccountByAccountNumberWithUserAndUserLimits(string accountNumber)
+        {
+            var account = await _dbSet.Where(x => x.AccountNumber == accountNumber)
+                .Include(x => x.AccountType)
+                .Include(x => x.UserApp).ThenInclude(x=> x.UserTransactionLimit)
+                .FirstOrDefaultAsync();
+            return account;
+        }
 
         public async Task<string> GetAccountHolderFullNameByAccountNumber(string accountNumber)
         {
@@ -47,6 +54,16 @@ namespace CreditWiseHub.Repository.Repositories
             var accountsTransactions = await _context.AffectedAccounts.Include(x => x.Transaction).Where(x => x.AccountNumber == accountNumber && (x.IsExternal == null || x.IsExternal! == false)).ToListAsync();
 
             account.TransactionAffectedAccounts = accountsTransactions;
+
+            return account;
+        }
+
+        public async Task<Account> GetUserDefaultAccountByAccountNumberWithUserAndUserLimits(string userID)
+        {
+            var account = await _dbSet.Where(x => x.UserAppId == userID && x.AccountTypeId == 1)
+                .Include(x => x.AccountType)
+                .Include(x => x.UserApp).ThenInclude(x => x.UserTransactionLimit)
+                .FirstOrDefaultAsync();
 
             return account;
         }

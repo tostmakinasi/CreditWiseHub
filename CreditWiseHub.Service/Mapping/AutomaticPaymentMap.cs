@@ -29,12 +29,13 @@ namespace CreditWiseHub.Service.Mapping
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.PaymentName));
 
             CreateMap<AutomaticPaymentRegistration, AutomaticPaymentDetailDto>()
-                .ForMember(dest => dest.PaymentType, opt => opt.MapFrom(src => src.PaymentType.ToString()));
+                .ForMember(dest => dest.PaymentType, opt => opt.MapFrom(src => src.PaymentType.ToString()))
+                .ForMember(dest=> dest.Status, opt => opt.MapFrom(src=> src.IsActive ? "Active":"Canceled"));
 
             CreateMap<AutomaticPaymentHistory, PaymentHistoryDto>();
 
             CreateMap<AutomaticPaymentRegistration, PaymentProcessDto>()
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.PaymentType == PaymentType.Loan? $"Ödeme Talimatı İşlemi : {src.Name} {src.PaymentDuePaidCount + 1}.Taksit ödemesi" : $"Ödeme Talimatı İşlemi : {src.Name} Fatura ödemesi"));
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.PaymentType == PaymentType.Loan? $"Ödeme Talimatı İşlemi : {src.Name} {src.PaymentDuePaidCount }.Taksit ödemesi" : $"Ödeme Talimatı İşlemi : {src.Name} Fatura ödemesi"));
         }
     }
 }

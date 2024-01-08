@@ -1,8 +1,8 @@
 ﻿using CreditWiseHub.Core.Dtos;
 using CreditWiseHub.Core.Dtos.Loan;
 using CreditWiseHub.Core.Dtos.LoanApplication;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Models;
+using CreditWiseHub.Core.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;

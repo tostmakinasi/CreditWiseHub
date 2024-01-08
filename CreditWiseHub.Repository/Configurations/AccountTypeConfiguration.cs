@@ -13,7 +13,7 @@ namespace CreditWiseHub.Repository.Configurations
             builder.Property(e => e.MinimumOpeningBalance).HasColumnType("decimal(18,2)").IsRequired();
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
             builder.Property(x => x.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
-
+            //builder.HasQueryFilter(x => x.IsActive == true);
             builder.HasData(
                 new AccountType
                 { 

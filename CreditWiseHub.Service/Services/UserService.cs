@@ -5,10 +5,10 @@ using CreditWiseHub.Core.Abstractions.UnitOfWorks;
 using CreditWiseHub.Core.Configurations;
 using CreditWiseHub.Core.Dtos;
 using CreditWiseHub.Core.Dtos.Account;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Dtos.User;
 using CreditWiseHub.Core.Enums;
 using CreditWiseHub.Core.Models;
+using CreditWiseHub.Core.Responses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -53,28 +53,20 @@ namespace CreditWiseHub.Service.Services
             {
                 var removeRolesResult = await _userManager.RemoveFromRolesAsync(user, existingRoles);
                 if (!removeRolesResult.Succeeded)
-                {
-                    var removeErrors = removeRolesResult.Errors.Select(x => x.Description).ToList();
-                    return Response<NoDataDto>.Fail(new ErrorDto(removeErrors, false), HttpStatusCode.InternalServerError);
-                }
+                    return Response<NoDataDto>.Fail(new ErrorDto(removeRolesResult.Errors, false), HttpStatusCode.InternalServerError);
             }
 
             var result = await _userManager.AddToRoleAsync(user, roleDto.RoleName);
 
             if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(x => x.Description).ToList();
-
-                return Response<NoDataDto>.Fail(new ErrorDto(errors, false), HttpStatusCode.InternalServerError);
-
-            }
+                return Response<NoDataDto>.Fail(new ErrorDto(result.Errors, false), HttpStatusCode.InternalServerError);
 
             return Response<NoDataDto>.Success(HttpStatusCode.OK);
         }
 
         public async Task<Response<UserDto>> CreateAsync(CreateUserDto createUserDto)
         {
-            //var tcknCheck = await UserNameValidationService(createUserDto);
+            //var tcknCheck = await UserTCKNValidationService(createUserDto);
 
             //if(!tcknCheck)
             //    return Response<UserDto>.Fail("User's TCKN does not match.", HttpStatusCode.BadRequest,true);
@@ -84,12 +76,8 @@ namespace CreditWiseHub.Service.Services
             var result = await _userManager.CreateAsync(user, createUserDto.Password);
 
             if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(x => x.Description).ToList();
+                return Response<UserDto>.Fail(new ErrorDto(result.Errors, true), HttpStatusCode.BadRequest);
 
-                return Response<UserDto>.Fail(new ErrorDto(errors, true), HttpStatusCode.BadRequest);
-
-            }
             await _userManager.AddToRoleAsync(user, RoleNames.User.ToString());
 
             var userLimits = new UserTransactionLimit
@@ -113,11 +101,21 @@ namespace CreditWiseHub.Service.Services
             };
             var accountInfo = await _accountService.CreateByUserName(user.UserName, defaultAccount);
 
-
             var userDto = _mapper.Map<UserDto>(user);
             userDto.DefaultAccountNumber = accountInfo.Data.AccountNumber;
 
             return Response<UserDto>.Success(userDto, HttpStatusCode.Created);
+        }
+        private static async Task<bool> UserTCKNValidationService(CreateUserDto userDto)
+        {
+            long userTckn;
+            if (!long.TryParse(userDto.TCKN, out userTckn))
+                return false;
+
+            using var client = new KPSPublicSoapClient(KPSPublicSoapClient.EndpointConfiguration.KPSPublicSoap);
+            var response = await client.TCKimlikNoDogrulaAsync(userTckn, userDto.Name, userDto.Surname, userDto.DateOfBirth.Year);
+
+            return response.Body.TCKimlikNoDogrulaResult;
         }
 
         public async Task<Response<UserDto>> GetByTCKNAsync(string userName)
@@ -128,18 +126,6 @@ namespace CreditWiseHub.Service.Services
                 return Response<UserDto>.Fail("User not found", HttpStatusCode.NotFound, true);
             
             return Response<UserDto>.Success(_mapper.Map<UserDto>(user), HttpStatusCode.OK);
-        }
-
-        private static async Task<bool> UserNameValidationService(CreateUserDto userDto)
-        {
-            long userTckn;
-            if (!long.TryParse(userDto.TCKN, out userTckn))
-                return false;
-
-            using var client = new KPSPublicSoapClient(KPSPublicSoapClient.EndpointConfiguration.KPSPublicSoap);
-            var response = await client.TCKimlikNoDogrulaAsync(userTckn, userDto.Name, userDto.Surname, userDto.DateOfBirth.Year);
-
-            return response.Body.TCKimlikNoDogrulaResult;
         }
 
         public async Task<Response<NoDataDto>> UpdateAsync(string userName, UpdateUserDto updateUserDto)
@@ -168,12 +154,8 @@ namespace CreditWiseHub.Service.Services
             var result = await _userManager.UpdateAsync(user);
 
             if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(x => x.Description).ToList();
 
-                return Response<NoDataDto>.Fail(new ErrorDto(errors, true), HttpStatusCode.BadRequest);
-
-            }
+                return Response<NoDataDto>.Fail(new ErrorDto(result.Errors, true), HttpStatusCode.BadRequest);
 
             return Response<NoDataDto>.Success(HttpStatusCode.OK);
         }

@@ -2,10 +2,10 @@
 using CreditWiseHub.Core.Abstractions.Repositories;
 using CreditWiseHub.Core.Abstractions.Services;
 using CreditWiseHub.Core.Abstractions.UnitOfWorks;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Dtos.Transactions;
 using CreditWiseHub.Core.Enums;
 using CreditWiseHub.Core.Models;
+using CreditWiseHub.Core.Responses;
 using System.Net;
 
 namespace CreditWiseHub.Service.Services
@@ -58,7 +58,6 @@ namespace CreditWiseHub.Service.Services
         {
             var transaction = await CreateTransaction(transferDto.Amount, true);
 
-
             var affectedAccount = await CreateAffectedAccount(account, transferDto.Amount, TransactionType.ExternalTransfer, transaction, (transferDto.TransferType == MoneyTransferType.Incoming), transferDto.AccountInformation.OwnerFullName);
 
             var affectedExternalAccount = new TransactionAffectedAccount()
@@ -86,28 +85,10 @@ namespace CreditWiseHub.Service.Services
         {
             var transaction = await CreateTransaction(transferDto.Amount, true);
 
-            var affectedReceiverAccount = await CreateAffectedAccount(receiverAccount, transferDto.Amount, TransactionType.ExternalTransfer, transaction, true, transferDto.AccountInformation.AccountHolderFullName);
+            var affectedReceiverAccount = await CreateAffectedAccount(receiverAccount, transferDto.Amount, TransactionType.InternalTransfer, transaction, true, transferDto.AccountInformation.AccountHolderFullName);
 
             var affectedSenderAccount = await CreateAffectedAccount(senderAccount, transferDto.Amount, TransactionType.InternalTransfer, transaction, false);
-            //TransactionAffectedAccount affectedReceiverAccount = new()
-            //{
-            //    IsReceiverAccount = true,
-            //    AccountNumber = receiverAccount.AccountNumber,
-            //    Description = $"Gelen Para Transferi Gönderen : {transferDto.AccountInformation.AccountHolderFullName}",
-            //    BeforeBalance = receiverAccount.Balance,
-            //    AfterBalance = receiverAccount.Balance + transferDto.Amount,
-            //};
 
-
-
-            //TransactionAffectedAccount affectedSenderAccount = new()
-            //{
-            //    IsReceiverAccount = false,
-            //    AccountNumber = transferDto.AccountInformation.AccountNumber,
-            //    Description = $"Giden Para Transferi Kime : {transferDto.AccountInformation.AccountHolderFullName}",
-            //    BeforeBalance = senderAccount.Balance,
-            //    AfterBalance = senderAccount.Balance - transferDto.Amount,
-            //};
 
             await _affectedAccountRepository.AddAsync(affectedReceiverAccount);
             await _affectedAccountRepository.AddAsync(affectedSenderAccount);

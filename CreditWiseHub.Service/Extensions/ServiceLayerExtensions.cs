@@ -21,8 +21,6 @@ namespace CreditWiseHub.Service.Extensions
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICustomerTicketService, CustomerTicketService>();
-            services.AddScoped<AccountHelper>();
-            services.AddScoped<SeedService>();
             return services;
         }
     }

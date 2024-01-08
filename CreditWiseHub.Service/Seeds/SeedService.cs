@@ -17,13 +17,11 @@ namespace CreditWiseHub.Service.Seeds
         private readonly UserManager<UserApp> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly AppDbContext _appDbContext;
-        private readonly AccountHelper _accountHelper;
-        public SeedService(UserManager<UserApp> userManager, RoleManager<IdentityRole> roleManager, AppDbContext appDbContext, AccountHelper accountHelper)
+        public SeedService(UserManager<UserApp> userManager, RoleManager<IdentityRole> roleManager, AppDbContext appDbContext)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _appDbContext = appDbContext;
-            _accountHelper = accountHelper;
         }
 
         public async Task SeedAsync()
@@ -128,7 +126,7 @@ namespace CreditWiseHub.Service.Seeds
                         await _appDbContext.SaveChangesAsync();
 
                         //add default account
-                        await _appDbContext.Accounts.AddAsync(SeedData.CreateDefaultAccount(user.Id, await _accountHelper.GenerateAccountNumberAsync()));
+                        await _appDbContext.Accounts.AddAsync(SeedData.CreateDefaultAccount(user.Id, Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper()));
                         await _appDbContext.SaveChangesAsync();
                     }
                 }

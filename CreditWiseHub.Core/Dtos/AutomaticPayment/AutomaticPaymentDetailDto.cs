@@ -16,6 +16,7 @@ namespace CreditWiseHub.Core.Dtos.AutomaticPayment
         public decimal PaymentAmount { get; set; }
         public int PaymentDueDay { get; set; }
         public int PaymentDueCount { get; set; }
+        public string Status { get; set; }
 
         public List<PaymentHistoryDto> AutomaticPaymentHistories { get; set; }
     }

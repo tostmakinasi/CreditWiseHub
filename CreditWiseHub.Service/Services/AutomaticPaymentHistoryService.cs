@@ -2,9 +2,11 @@
 using CreditWiseHub.Core.Abstractions.Repositories;
 using CreditWiseHub.Core.Abstractions.Services;
 using CreditWiseHub.Core.Abstractions.UnitOfWorks;
+using CreditWiseHub.Core.Dtos;
 using CreditWiseHub.Core.Dtos.AutomaticPayment;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Models;
+using CreditWiseHub.Core.Responses;
+using CreditWiseHub.Service.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

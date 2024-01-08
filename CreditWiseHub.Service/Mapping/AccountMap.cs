@@ -36,7 +36,33 @@ namespace CreditWiseHub.Service.Mapping
             CreateMap<AffectedAccountDto, TransactionAffectedAccount>();
             CreateMap<AffectedAccountDto, ExternalAccountInformation>();
             CreateMap<AffectedExternalAccountDto, ExternalAccountInformation>();
+            CreateMap<Account, RecipientAccountInfoDto>()
+                .ForMember(dest => dest.OwnerFullName, opt => opt.MapFrom(src => GenerateUserNameWithCensor($"{src.UserApp.Name} {src.UserApp.Surname}")))
+                .ForMember(dest => dest.AccountId, opt => opt.MapFrom(src => src.Id));
+                
 
+
+        }
+
+        public string GenerateUserNameWithCensor(string userName)
+        {
+            string result = "";
+
+            string[] words = userName.Split(' ');
+
+            foreach (var word in words)
+            {
+                if (word.Length > 1)
+                {
+                    result += $"{word.Substring(0, 1)}{new string('*', word.Length - 1)} ";
+                }
+                else
+                {
+                    result += $"{word} ";
+                }
+            }
+
+            return result.Trim();
         }
     }
 }

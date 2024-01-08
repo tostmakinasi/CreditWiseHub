@@ -1,6 +1,6 @@
 ﻿using CreditWiseHub.Core.Dtos;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Dtos.Ticket;
+using CreditWiseHub.Core.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,6 +1,6 @@
 ﻿using CreditWiseHub.Core.Dtos;
 using CreditWiseHub.Core.Dtos.AccountType;
-using CreditWiseHub.Core.Dtos.Responses;
+using CreditWiseHub.Core.Responses;
 
 namespace CreditWiseHub.Core.Abstractions.Services
 {

@@ -14,49 +14,18 @@ namespace CreditWiseHub.BackgroundJob.Managers.RecurringJobs
 {
     public class AutomaticPaymentsScheduleJobsManager
     {
+        private readonly IAutomaticPaymentService _paymentService;
 
-        private readonly IAccountService _accountService;
-        private readonly IAutomaticPaymentHistoryService _automaticPaymentHistoryService;
-        private readonly IAutomaticPaymentsRegistrationRepository _paymentRepository;
-        private readonly IMapper _mapper;
-
-        public AutomaticPaymentsScheduleJobsManager(IAccountService accountService, IAutomaticPaymentsRegistrationRepository paymentRepository, IAutomaticPaymentHistoryService automaticPaymentHistoryService)
+        public AutomaticPaymentsScheduleJobsManager(IAutomaticPaymentService paymentService)
         {
-            _accountService = accountService;
-            _paymentRepository = paymentRepository;
-            _automaticPaymentHistoryService = automaticPaymentHistoryService;
+            _paymentService = paymentService;
         }
 
         public async Task Process()
         {
-            var payments = await _paymentRepository.GetPaymentsDueToday(GetLastInMonthDays());
-
-            foreach (var payment in payments)
-            {
-                var dto = _mapper.Map<PaymentProcessDto>(payment);
-
-                var accountResult = await _accountService.WithdrawMoneyForAutomaticPayment(dto);
-
-                 await _automaticPaymentHistoryService.AddPaymentHistory(payment, accountResult);
-            }
+            await _paymentService.HandlePaymentProcess();
         }
 
-        private List<int> GetLastInMonthDays()
-        {
-            var date = DateTime.UtcNow;
-            var lastDayInMonth = DateTime.DaysInMonth(date.Year, date.Month);
-
-            if (date.Day <= lastDayInMonth)
-                return new List<int> { date.Day };
-
-            List<int> days = new List<int>();
-
-            for (int i = 31; i <= date.Day; i--)
-            {
-                days.Add(i);
-            }
-
-            return days;
-        }
+   
     }
 }

@@ -2,10 +2,10 @@
 using CreditWiseHub.Core.Abstractions.Services;
 using CreditWiseHub.Core.Abstractions.UnitOfWorks;
 using CreditWiseHub.Core.Dtos;
-using CreditWiseHub.Core.Dtos.Responses;
 using CreditWiseHub.Core.Dtos.Token;
 using CreditWiseHub.Core.Dtos.User;
 using CreditWiseHub.Core.Models;
+using CreditWiseHub.Core.Responses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net;

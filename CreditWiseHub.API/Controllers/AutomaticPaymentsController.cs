@@ -26,5 +26,6 @@ namespace CreditWiseHub.API.Controllers
         [HttpGet("{automaticPaymentId}")]
         public async Task<IActionResult> GetRegisteredPaymentById(long automaticPaymentId) =>
             ActionResultInstance(await _automaticPaymentService.GetRegisteredPaymentById(automaticPaymentId));
+
     }
 }

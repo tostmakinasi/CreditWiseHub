@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json.Serialization;
 
-namespace CreditWiseHub.Core.Dtos.Responses
+namespace CreditWiseHub.Core.Responses
 {
     public class Response<T> where T : class
     {
