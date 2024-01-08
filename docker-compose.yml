@@ -1,7 +1,8 @@
 version: '3.4'
-
+name: docker-finalcase-creditwisehub-compose
 services:
   creditwisehub.api:
+    container_name: creditwise-hub
     image: ${DOCKER_REGISTRY-}creditwisehubapi
     build:
       context: .
