@@ -81,3 +81,8 @@ Not: Bu proje, Windows, Linux veya Mac işletim sistemlerinde çalışabilir. An
 <a href="https://documenter.getpostman.com/view/28275528/2s9YsJAXVi"><img src="https://raw.githubusercontent.com/postmanlabs/postmanlabs.github.io/develop/global-artefacts/postman-logo%2Btext-320x132.png" /></a>
 
 ### [Click for Postman API documentation](https://documenter.getpostman.com/view/28275528/2s9YsJAXVi) 
+
+### Swagger
+
+![image](https://github.com/tostmakinasi/CreditWiseHub/blob/master/Assets/SwaggerUI-localhost.png)
+
