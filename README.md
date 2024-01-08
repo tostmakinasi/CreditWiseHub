@@ -78,9 +78,44 @@ Note: This project can run on Windows, Linux, or Mac operating systems. However,
 
 Not: Bu proje, Windows, Linux veya Mac işletim sistemlerinde çalışabilir. Ancak, docker ve docker-compose'in kurulu ve çalışır durumda olması gerekir. Bu araçları nasıl kuracağınızı öğrenmek için, docker belgelerine veya docker-compose belgelerine bakabilirsiniz.
 
+## Docker Compose Configuration 
+ ```bash
+version: '3.4'
+name: docker-finalcase-creditwisehub-compose
+services:
+ postgres:
+  container_name: container-pg
+  image: postgres
+  hostname: localhost
+  ports:
+  - "5432:5432"
+  environment:
+   POSTGRES_USER: admin
+   POSTGRES_PASSWORD: root
+   POSTGRES_DB: "HangfireDB"
+  volumes:
+  - postgres-data:/var/lib/postgresql/data
+  - "./scripts/init.sql:/docker-entrypoint-initdb.d/script.sql"
+  restart: unless-stopped
+
+ creditwisehub.api:
+  container_name: creditwise-hub
+  image: ${DOCKER_REGISTRY-}creditwisehubapi
+  build:
+    context: .
+    dockerfile: CreditWiseHub.API/Dockerfile
+  depends_on:
+  - postgres
+
+volumes:
+  postgres-data:
+  
+```
+### [Click for Postman API documentation](https://documenter.getpostman.com/view/28275528/2s9YsJAXVi) 
+
 <a href="https://documenter.getpostman.com/view/28275528/2s9YsJAXVi"><img src="https://raw.githubusercontent.com/postmanlabs/postmanlabs.github.io/develop/global-artefacts/postman-logo%2Btext-320x132.png" /></a>
 
-### [Click for Postman API documentation](https://documenter.getpostman.com/view/28275528/2s9YsJAXVi) 
+
 
 ### Swagger
 
