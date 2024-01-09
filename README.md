@@ -4,7 +4,7 @@
 
 
 <p align="center">
-  <img src="./_ca5cb410-fb83-439d-963f-317523b33512.jpeg" align =center width="400">
+  <img src="./Assets/_ca5cb410-fb83-439d-963f-317523b33512.jpeg" align =center width="400">
 </p>
 
 
