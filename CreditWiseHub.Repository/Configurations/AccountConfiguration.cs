@@ -24,7 +24,7 @@ namespace CreditWiseHub.Repository.Configurations
                 .OnDelete(DeleteBehavior.NoAction);
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
             builder.Property(x => x.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
-
+            builder.HasQueryFilter(x => x.IsActive);
             builder.Property<uint>("Version")
               .IsRowVersion();
 

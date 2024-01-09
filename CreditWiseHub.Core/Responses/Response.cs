@@ -5,19 +5,24 @@ namespace CreditWiseHub.Core.Responses
 {
     public class Response<T> where T : class
     {
-        public T Data { get; private set; }
-        public int StatusCode { get; private set; }
-        public ErrorDto Error { get; private set; }
+        [JsonPropertyName("data")]
+        public T? data { get; private set; }
 
-        [JsonIgnore]
-        public bool IsSuccess { get; private set; }
+        [JsonPropertyName("statusCode")]
+        public int statusCode { get; private set; }
 
-        public static Response<T> Success(T data, HttpStatusCode statusCode) => new Response<T> { Data = data, StatusCode = (int)statusCode, IsSuccess = true };
+        [JsonPropertyName("error")]
+        public ErrorDto? error { get; private set; }
 
-        public static Response<T> Success(HttpStatusCode statusCode) => new Response<T> { Data = default, StatusCode = (int)statusCode, IsSuccess = true };
+        [JsonPropertyName("isSuccess")]
+        public bool isSuccess { get; private set; }
 
-        public static Response<T> Fail(ErrorDto error, HttpStatusCode statusCode) => new Response<T> { Error = error, StatusCode = (int)statusCode, IsSuccess = false };
+        public static Response<T> Success(T data, HttpStatusCode statusCode) => new Response<T> { data = data, statusCode = (int)statusCode, isSuccess = true };
 
-        public static Response<T> Fail(string error, HttpStatusCode statusCode, bool isShow) => new Response<T> { Error = new ErrorDto(error, isShow), StatusCode = (int)statusCode, IsSuccess = false };
+        public static Response<T> Success(HttpStatusCode statusCode) => new Response<T> { data = default, statusCode = (int)statusCode, isSuccess = true };
+
+        public static Response<T> Fail(ErrorDto error, HttpStatusCode statusCode) => new Response<T> { error = error, statusCode = (int)statusCode, isSuccess = false };
+
+        public static Response<T> Fail(string error, HttpStatusCode statusCode, bool isShow) => new Response<T> { error = new ErrorDto(error, isShow), statusCode = (int)statusCode, isSuccess = false };
     }
 }

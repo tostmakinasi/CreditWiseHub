@@ -50,7 +50,7 @@ namespace CreditWiseHub.Service.Services
 
             var transactionResponse = await _accountService.TransferCreditToAccountByUserId(application.UserId, application.RequestedAmount);
 
-            application.TransactionId = transactionResponse.Data.TransactionId;
+            application.TransactionId = transactionResponse.data.TransactionId;
             await _unitOfWork.CommitAsync();
 
             using LoanHelper helper = new LoanHelper(application.RequestedAmount, application.LoanType.InterestRate, application.InstallmentCount, application.ApprovalDate.Value);

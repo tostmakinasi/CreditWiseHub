@@ -1,4 +1,5 @@
 ﻿using CreditWiseHub.Core.Models;
+using System.Linq.Expressions;
 
 namespace CreditWiseHub.Core.Abstractions.Repositories
 {
@@ -14,9 +15,33 @@ namespace CreditWiseHub.Core.Abstractions.Repositories
         /// <returns>The account associated with the provided account number, or null if not found.</returns>
         Task<Account> GetAccountByAccountNumber(string accountNumber);
 
-        Task<Account> GetUserDefaultAccountByAccountNumberWithUserAndUserLimits(string userID);
+        /// <summary>
+        /// Gets the default account of a user by user ID with user and user limits information.
+        /// </summary>
+        /// <param name="userID">The user ID to retrieve the default account for.</param>
+        /// <returns>The default account of the user with user and user limits information.</returns>
+        Task<Account> GetUserDefaultAccountByUserIdWithUserAndUserLimits(string userID);
 
+        /// <summary>
+        /// Gets an account with user and user limits information based on the account number.
+        /// </summary>
+        /// <param name="accountNumber">The account number to retrieve the account information for.</param>
+        /// <returns>The account with user and user limits information, or null if not found.</returns>
         Task<Account> GetAccountByAccountNumberWithUserAndUserLimits(string accountNumber);
+
+        /// <summary>
+        /// Checks if a user has any default account.
+        /// </summary>
+        /// <param name="expression">The expression to filter the accounts.</param>
+        /// <returns>True if the user has any default account; otherwise, false.</returns>
+        Task<bool> UserHaveDefaultAccountAnyAsync(Expression<Func<Account, bool>> expression);
+
+        /// <summary>
+        /// Gets the account balance based on the account number.
+        /// </summary>
+        /// <param name="accountNumber">The account number to retrieve the balance for.</param>
+        /// <returns>The balance of the account, or zero if not found.</returns>
+        Task<decimal> GetAccountBalanceByAccountNumber(string accountNumber);
 
         /// <summary>
         /// Gets the full name of the account holder based on the account number.
@@ -45,5 +70,6 @@ namespace CreditWiseHub.Core.Abstractions.Repositories
         /// <returns>The account with its transaction history, or null if not found.</returns>
         Task<Account> GetAccountsWithTransactionsByAccountNumber(string accountNumber);
     }
+
 
 }

@@ -1,7 +1,9 @@
 ﻿using CreditWiseHub.Core.Abstractions.Repositories;
+using CreditWiseHub.Core.Commons;
 using CreditWiseHub.Core.Models;
 using CreditWiseHub.Repository.Contexts;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace CreditWiseHub.Repository.Repositories
 {
@@ -16,6 +18,12 @@ namespace CreditWiseHub.Repository.Repositories
         public async Task AddExternalAccount(ExternalAccountInformation externalAccountInformation)
         {
             await _externalAccountInformationRepository.AddAsync(externalAccountInformation);
+        }
+
+        public async Task<decimal> GetAccountBalanceByAccountNumber(string accountNumber)
+        {
+            var balance = await _dbSet.Where(x => x.AccountNumber == accountNumber).Select(x => x.Balance).FirstOrDefaultAsync();
+            return balance;
         }
 
         public async Task<Account?> GetAccountByAccountNumber(string accountNumber)
@@ -58,14 +66,20 @@ namespace CreditWiseHub.Repository.Repositories
             return account;
         }
 
-        public async Task<Account> GetUserDefaultAccountByAccountNumberWithUserAndUserLimits(string userID)
+        public async Task<Account> GetUserDefaultAccountByUserIdWithUserAndUserLimits(string userID)
         {
             var account = await _dbSet.Where(x => x.UserAppId == userID && x.AccountTypeId == 1)
                 .Include(x => x.AccountType)
                 .Include(x => x.UserApp).ThenInclude(x => x.UserTransactionLimit)
                 .FirstOrDefaultAsync();
-
             return account;
+        }
+
+        public Task<bool> UserHaveDefaultAccountAnyAsync(Expression<Func<Account, bool>> expression)
+        {
+            var result = _dbSet.Where(expression).AnyAsync();
+
+            return result;
         }
     }
 }

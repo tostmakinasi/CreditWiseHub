@@ -102,7 +102,7 @@ namespace CreditWiseHub.Service.Services
             var accountInfo = await _accountService.CreateByUserName(user.UserName, defaultAccount);
 
             var userDto = _mapper.Map<UserDto>(user);
-            userDto.DefaultAccountNumber = accountInfo.Data.AccountNumber;
+            userDto.DefaultAccountNumber = accountInfo.data.AccountNumber;
 
             return Response<UserDto>.Success(userDto, HttpStatusCode.Created);
         }

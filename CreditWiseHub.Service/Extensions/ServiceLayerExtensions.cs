@@ -1,6 +1,5 @@
 ﻿using CreditWiseHub.Core.Abstractions.Services;
 using CreditWiseHub.Service.Helpers;
-using CreditWiseHub.Service.Seeds;
 using CreditWiseHub.Service.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,6 +20,7 @@ namespace CreditWiseHub.Service.Extensions
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICustomerTicketService, CustomerTicketService>();
+            services.AddSingleton<GuidHelper>();
             return services;
         }
     }

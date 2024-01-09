@@ -56,7 +56,7 @@ namespace CreditWiseHub.Service.Services
 
             var ticket = _mapper.Map<CustomerTicket>(createTicketDto);
 
-            ticket.UserAppId = user.Id;
+            ticket.UserId = user.Id;
             await _ticketRepository.AddAsync(ticket);
             await _unitOfWork.CommitAsync();
             var ticketDto = _mapper.Map<TicketDto>(ticket);

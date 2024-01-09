@@ -11,7 +11,7 @@ namespace CreditWiseHub.API.Controllers
 
         public IActionResult ActionResultInstance<T>(Response<T> response) where T : class => new ObjectResult(response)
         {
-            StatusCode = response.StatusCode
+            StatusCode = response.statusCode
         };
 
         protected string GetAutUserId()

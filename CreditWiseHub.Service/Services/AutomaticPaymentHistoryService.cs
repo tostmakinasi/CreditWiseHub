@@ -34,16 +34,16 @@ namespace CreditWiseHub.Service.Services
                 PaymentAmount = paymnet.PaymentAmount,
             };
 
-            if (processResult.IsSuccess)
+            if (processResult.isSuccess)
             {
                 history.Comment = "Ödeme alındı";
-                history.PaymentDate = processResult.Data.PaymentDate;
+                history.PaymentDate = processResult.data.PaymentDate;
                 history.IsPaid = true;
-                history.TransactionId = processResult.Data.TransactionId;
+                history.TransactionId = processResult.data.TransactionId;
             }
             else
             {
-                history.Comment = $"Ödeme başarısız. Sebebi : {processResult.Error.Errors[0]}";
+                history.Comment = $"Ödeme başarısız. Sebebi : {processResult.error.Errors[0]}";
                 history.PaymentDate = DateTime.UtcNow;
                 history.IsPaid = false;
                 history.TransactionId = null;

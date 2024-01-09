@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Text.Json.Serialization;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CreditWiseHub.Core.Responses
 {
     public class ErrorDto
     {
+        [JsonPropertyName("errors")]
         public List<string> Errors { get; private set; }
 
+        [JsonPropertyName("isShow")]
         public bool IsShow { get; private set; }
 
         public ErrorDto()

@@ -10,18 +10,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CreditWiseHub.Service.Seeds
+namespace CreditWiseHub.Tests.Seeds
 {
     public class SeedService
     {
+        private readonly AppDbContext _appDbContext;
         private readonly UserManager<UserApp> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly AppDbContext _appDbContext;
-        public SeedService(UserManager<UserApp> userManager, RoleManager<IdentityRole> roleManager, AppDbContext appDbContext)
+        public SeedService(AppDbContext appDbContext, UserManager<UserApp> userManager, RoleManager<IdentityRole> roleManager)
         {
+            _appDbContext = appDbContext;
             _userManager = userManager;
             _roleManager = roleManager;
-            _appDbContext = appDbContext;
         }
 
         public async Task SeedAsync()
@@ -35,15 +35,15 @@ namespace CreditWiseHub.Service.Seeds
                 }
             }
 
-            var accountTpes = new List<AccountType>{
+            var accountTypes = new List<AccountType>{
                 new AccountType
-            {
-                Id = 1,
-                MinimumOpeningBalance = 0,
-                CreatedDate = DateTime.UtcNow,
-                Name = "Vadesiz Hesap",
-                Description = "Kullanıcı ilk kayıt olurken açılan hesap türü"
-            },
+                {
+                    Id = 1,
+                    MinimumOpeningBalance = 0,
+                    CreatedDate = DateTime.UtcNow,
+                    Name = "Vadesiz Hesap",
+                    Description = "Kullanıcı ilk kayıt olurken açılan hesap türü"
+                },
                 new AccountType
                 {
                     Id = 2,
@@ -60,14 +60,14 @@ namespace CreditWiseHub.Service.Seeds
                     Description = "Günlük vadeli mevduat hesabı",
                     CreatedDate = DateTime.UtcNow,
                 }};
-            accountTpes.ForEach( x =>
+            accountTypes.ForEach(x =>
             {
                 var existingaccountType = _appDbContext.AccountTypes.Where(y => y.Id == x.Id).FirstOrDefault();
 
                 if (existingaccountType is null)
                 {
-                     _appDbContext.AccountTypes.AddAsync(x);
-                     _appDbContext.SaveChangesAsync();
+                    _appDbContext.AccountTypes.AddAsync(x);
+                    _appDbContext.SaveChangesAsync();
                 }
             });
 
@@ -95,13 +95,13 @@ namespace CreditWiseHub.Service.Seeds
                 }
            };
 
-            loantypes.ForEach( x =>
+            loantypes.ForEach(x =>
             {
                 var existingaccountType = _appDbContext.LoanTypes.Where(y => y.Id == x.Id).FirstOrDefault();
 
                 if (existingaccountType is null)
                 {
-                     _appDbContext.LoanTypes.Add(x);
+                    _appDbContext.LoanTypes.Add(x);
                     _appDbContext.SaveChanges();
                 }
             });
@@ -119,7 +119,7 @@ namespace CreditWiseHub.Service.Seeds
                     if (result.Succeeded)
                     {
                         // Assign roles if needed
-                        await _userManager.AddToRoleAsync(user, GetRoleNameFromUserName(user.UserName));
+                        await _userManager.AddToRoleAsync(user, GetRoleNameFromUserName(user.Name));
 
                         //add transaction limits
                         await _appDbContext.UserTransactionLimits.AddAsync(SeedData.CreateLimitData(user.Id));

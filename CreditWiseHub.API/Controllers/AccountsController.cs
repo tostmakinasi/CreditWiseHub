@@ -38,6 +38,12 @@ namespace CreditWiseHub.API.Controllers
 
         [Authorize(Roles = "User, CashDesk")]
         [AuthorizeByAccountNumber]
+        [HttpGet("{accountNumber}/balance")]
+        public async Task<IActionResult> GetAccountBalanceByAccountNumber(string accountNumber) =>
+           ActionResultInstance(await _accountService.GetAccountBalanceByAccountNumber(accountNumber));
+
+        [Authorize(Roles = "User, CashDesk")]
+        [AuthorizeByAccountNumber]
         [HttpPost("{accountNumber}/deposit")]
         public async Task<IActionResult> DepositAsync(string accountNumber, MoneyProcessAmountDto dto) =>
             ActionResultInstance(await _accountService.DepositMoneyByAccountNumber(accountNumber, dto));
@@ -65,5 +71,11 @@ namespace CreditWiseHub.API.Controllers
         [HttpPut("{accountNumber}")]
         public async Task<IActionResult> UpdateAccountByAccountNumber(string accountNumber, UpdateAccountDto updateAccountDto) =>
           ActionResultInstance(await _accountService.UpdateAccountAsync(accountNumber, updateAccountDto));
+
+        [Authorize(Roles = "User, CashDesk")]
+        [AuthorizeByAccountNumber]
+        [HttpDelete("{accountNumber}")]
+        public async Task<IActionResult> CloseAccountByAccountNumber(string accountNumber) =>
+          ActionResultInstance(await _accountService.CloseAccount(accountNumber));
     }
 }

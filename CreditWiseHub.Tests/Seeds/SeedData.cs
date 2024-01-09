@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CreditWiseHub.Service.Seeds
+namespace CreditWiseHub.Tests.Seeds
 {
     public static class SeedData
     {
@@ -17,7 +17,7 @@ namespace CreditWiseHub.Service.Seeds
             // Seed for Admin
             seedUsers.Add(new UserApp
             {
-                UserName = "AdminUser123",
+                UserName = "11111111111",
                 Name = "Admin",
                 Surname = "User",
                 DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc),
@@ -29,7 +29,7 @@ namespace CreditWiseHub.Service.Seeds
             // Seed for User
             seedUsers.Add(new UserApp
             {
-                UserName = "User123456789",
+                UserName = "22222222222",
                 Name = "User",
                 Surname = "User",
                 DateOfBirth = new DateTime(1995, 5, 5, 0, 0, 0, DateTimeKind.Utc),
@@ -41,7 +41,7 @@ namespace CreditWiseHub.Service.Seeds
             // Seed for Auditor
             seedUsers.Add(new UserApp
             {
-                UserName = "Auditor987654321",
+                UserName = "33333333333",
                 Name = "Auditor",
                 Surname = "User",
                 DateOfBirth = new DateTime(1985, 10, 10, 0, 0, 0, DateTimeKind.Utc),
@@ -53,7 +53,7 @@ namespace CreditWiseHub.Service.Seeds
             // Seed for CashDesk
             seedUsers.Add(new UserApp
             {
-                UserName = "CashDeskUser112233",
+                UserName = "44444444444",
                 Name = "CashDesk",
                 Surname = "User",
                 DateOfBirth = new DateTime(1980, 3, 15, 0, 0, 0, DateTimeKind.Utc),
@@ -65,7 +65,7 @@ namespace CreditWiseHub.Service.Seeds
             // Seed for CustomerService
             seedUsers.Add(new UserApp
             {
-                UserName = "CustomerServiceUser445566",
+                UserName = "55555555555",
                 Name = "CustomerService",
                 Surname = "User",
                 DateOfBirth = new DateTime(1992, 8, 20,0,0,0,DateTimeKind.Utc),

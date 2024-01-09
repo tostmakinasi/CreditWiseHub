@@ -5,9 +5,17 @@ using System.Security.Claims;
 
 namespace CreditWiseHub.API.Filters
 {
+    /// <summary>
+    /// Custom authorization attribute for ensuring that the logged-in user with the 'User' role owns the specified account number.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
     public class AuthorizeByAccountNumberAttribute : Attribute, IAsyncAuthorizationFilter
     {
+        /// <summary>
+        /// Validates the authorization based on the user's role and ownership of the specified account number.
+        /// </summary>
+        /// <param name="context">The authorization filter context.</param>
+        /// <returns>A task representing the asynchronous operation of checking and setting the authorization result.</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var user = context.HttpContext.User;
@@ -31,5 +39,6 @@ namespace CreditWiseHub.API.Filters
             return;
         }
     }
+
 
 }

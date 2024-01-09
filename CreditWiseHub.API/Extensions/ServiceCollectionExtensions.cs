@@ -17,6 +17,21 @@ namespace CreditWiseHub.API.Extensions
 {
     public static class ServiceCollectionExtensions
     {
+        public static bool TestServer = false;
+
+        public static IServiceCollection AddHangfireWithExtension(this IServiceCollection services, string hangfireDbConnectionStrings) {
+
+            if (!TestServer)
+            {
+                services.AddHangfire(configuration =>
+                    configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                    .UsePostgreSqlStorage(hangfireDbConnectionStrings));
+            }
+            return services;
+        }
+
         public static IServiceCollection AddScopedWithExtension(this IServiceCollection services)
         {
             services.AddServicesWithExtension();
