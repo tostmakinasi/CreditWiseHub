@@ -49,7 +49,7 @@ namespace CreditWiseHub.Tests.AccountOperationsIntegrationTest
         }
 
         [Fact]
-        public async Task CreateAccount_Returns_201Created()
+        public async Task CreateAccount_DepositAccount_InternalTransfer_IntegrationTest()
         {
 
             // Arrange
