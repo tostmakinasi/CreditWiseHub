@@ -1,4 +1,5 @@
 ﻿using CreditWiseHub.Core.Abstractions.UnitOfWorks;
+using CreditWiseHub.Core.Configurations;
 using CreditWiseHub.Repository.Contexts;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -15,7 +16,8 @@ namespace CreditWiseHub.Repository.UnitOfWorks
 
         public async Task BeginTransactionAsync()
         {
-            _transaction = await _context.Database.BeginTransactionAsync();
+            if(!TestServerOptions.TestServer)
+                _transaction = await _context.Database.BeginTransactionAsync();
         }
 
         public void Commit()
@@ -30,18 +32,22 @@ namespace CreditWiseHub.Repository.UnitOfWorks
 
         public async Task TransactionCommitAsync()
         {
-            try
+            if (!TestServerOptions.TestServer)
             {
-                await _transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await _transaction.RollbackAsync();
-                throw;
-            }
-            finally
-            {
-                _transaction.Dispose();
+                _transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    await _transaction.CommitAsync();
+                }
+                catch (Exception)
+                {
+                    await _transaction.RollbackAsync();
+                    throw;
+                }
+                finally
+                {
+                    _transaction.Dispose();
+                }
             }
         }
     }

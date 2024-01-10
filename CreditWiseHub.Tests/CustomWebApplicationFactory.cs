@@ -22,7 +22,7 @@ namespace CreditWiseHub.Tests
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            CreditWiseHub.API.Extensions.ServiceCollectionExtensions.TestServer = true;
+            TestServerOptions.TestServer = true;
 
             builder.ConfigureServices(async services =>
             {

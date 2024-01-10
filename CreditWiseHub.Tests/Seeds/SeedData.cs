@@ -71,7 +71,8 @@ namespace CreditWiseHub.Tests.Seeds
                 DateOfBirth = new DateTime(1992, 8, 20,0,0,0,DateTimeKind.Utc),
                 IsActive = true,
                 CreatedDate = DateTime.UtcNow,
-                Email = "customerservice@example.com" // Provide a valid email
+                Email = "customerservice@example.com" ,// Provide a valid email
+                
             });
 
             return seedUsers;
@@ -87,6 +88,7 @@ namespace CreditWiseHub.Tests.Seeds
                 DailyTransactionLimit = DefaultsTransactionLimits.MonthlyTransactionLimits,
                 DailyTransactionAmount = 0,
                 LastProcessDate = DateTime.UtcNow,
+
             };
         }
 
@@ -97,10 +99,11 @@ namespace CreditWiseHub.Tests.Seeds
                 AccountNumber = accountNumber,
                 Name = "Default Account",
                 Description = "Default account for the user",
-                Balance = 0, 
+                Balance = 0,
                 UserAppId = userId,
                 AccountTypeId = 1,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow,
+                IsActive = true
             };
         }
 

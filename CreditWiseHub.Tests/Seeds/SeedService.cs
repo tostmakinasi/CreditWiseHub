@@ -126,7 +126,7 @@ namespace CreditWiseHub.Tests.Seeds
                         await _appDbContext.SaveChangesAsync();
 
                         //add default account
-                        await _appDbContext.Accounts.AddAsync(SeedData.CreateDefaultAccount(user.Id, Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper()));
+                        await _appDbContext.Accounts.AddAsync(SeedData.CreateDefaultAccount(user.Id, user.UserName.Substring(0,10)));
                         await _appDbContext.SaveChangesAsync();
                     }
                 }

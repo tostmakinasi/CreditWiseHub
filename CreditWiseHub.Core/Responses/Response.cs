@@ -14,7 +14,7 @@ namespace CreditWiseHub.Core.Responses
         [JsonPropertyName("error")]
         public ErrorDto? error { get; private set; }
 
-        [JsonPropertyName("isSuccess")]
+        [JsonIgnore]
         public bool isSuccess { get; private set; }
 
         public static Response<T> Success(T data, HttpStatusCode statusCode) => new Response<T> { data = data, statusCode = (int)statusCode, isSuccess = true };

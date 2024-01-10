@@ -59,7 +59,7 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-if(!CreditWiseHub.API.Extensions.ServiceCollectionExtensions.TestServer) {
+if(!TestServerOptions.TestServer) {
 
     app.UseHangfireDashboard("/hangfire", new DashboardOptions()
     {

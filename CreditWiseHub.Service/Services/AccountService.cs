@@ -66,6 +66,7 @@ namespace CreditWiseHub.Service.Services
             account.AccountTypeId = accountType.Id;
             account.AccountType = accountType;
             account.CreatedDate = DateTime.UtcNow;
+            account.IsActive = true;
             await _unitOfWork.BeginTransactionAsync();
 
             await _accountRepository.AddAsync(account);

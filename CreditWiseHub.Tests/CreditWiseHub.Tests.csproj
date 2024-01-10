@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FinalCase\CreditWiseHub.API\CreditWiseHub.API.csproj" />
+    <ProjectReference Include="..\CreditWiseHub.API\CreditWiseHub.API.csproj" />
   </ItemGroup>
 
 </Project>
